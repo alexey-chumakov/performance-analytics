@@ -1,8 +1,9 @@
-package com.ghx.hackaton.analytcis.agent;
+package com.ghx.hackaton.analytcis.agent.logger;
 
-import com.ghx.hackaton.analytcis.agent.base.ExecutionInfo;
-import com.ghx.hackaton.analytcis.agent.base.SimpleExecutionInfoHolder;
-import com.ghx.hackaton.analytcis.agent.base.ThreadLocalExecutionInfoHolder;
+import com.ghx.hackaton.analytcis.agent.logger.base.ExecutionInfo;
+import com.ghx.hackaton.analytcis.agent.logger.base.SimpleExecutionInfoHolder;
+import com.ghx.hackaton.analytcis.agent.logger.base.ThreadLocalExecutionInfoHolder;
+import com.ghx.hackaton.analytcis.agent.commons.ExternalSystemType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +18,14 @@ public class RequestLogger {
 
     private static RequestLogger requestLogger = new RequestLogger();
 
-    private SimpleExecutionInfoHolder<String> requestStats = new SimpleExecutionInfoHolder<String>();
+    private SimpleExecutionInfoHolder requestStats = new SimpleExecutionInfoHolder();
 
-    private ThreadLocalExecutionInfoHolder<ExternalSystemType> externalCallStats = new ThreadLocalExecutionInfoHolder<ExternalSystemType>();
+    private ThreadLocalExecutionInfoHolder threadLocalStats = new ThreadLocalExecutionInfoHolder();
 
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
 
     public RequestLogger() {
-        executorService.scheduleAtFixedRate(new EventEvictionThread(), 15, 15, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new EventEvictionThread(), 30, 30, TimeUnit.SECONDS);
     }
 
     public static RequestLogger getInstance() {
@@ -35,6 +36,8 @@ public class RequestLogger {
         try {
             ExecutionInfo info = getExecutionInfo(url);
             info.increaseExecutionTimes(processingTime);
+            HashMap<String, ExecutionInfo> requestDetails = threadLocalStats.getAndCleanup();
+            info.addDetails(requestDetails);
         } catch (Exception e) {
             // Avoid any interruption in request processing
             e.printStackTrace();
@@ -43,7 +46,7 @@ public class RequestLogger {
 
     public void logExternalSystemUsage(ExternalSystemType type, Long processingTime) {
         try {
-            ExecutionInfo info = externalCallStats.getExecutionInfoForKey(type);
+            ExecutionInfo info = threadLocalStats.getExecutionInfoForKey(type.name());
             info.increaseExecutionTimes(processingTime);
         } catch (Exception e) {
             // Avoid any interruption in request processing
@@ -77,14 +80,31 @@ public class RequestLogger {
         }
 
         private void evictEvents() {
-            HashMap<String, ExecutionInfo> executionInfo = requestStats.getAndCleanup();
-            for (Map.Entry<String, ExecutionInfo> entry : executionInfo.entrySet()) {
+            HashMap<String, ExecutionInfo> loggedRequests = requestStats.getAndCleanup();
+            for (Map.Entry<String, ExecutionInfo> entry : loggedRequests.entrySet()) {
                 String url = entry.getKey();
-                int executionCount = entry.getValue().getExecutionCount().get();
-                long executionTimeTotal = entry.getValue().getExecutionTimeTotal().get();
+                ExecutionInfo executionInfo = entry.getValue();
+                int executionCount = executionInfo.getExecutionCount();
+                long executionTimeTotal = executionInfo.getExecutionTimeTotal();
                 float processingTime = executionTimeTotal / executionCount;
+
                 // FIXME send data instead of printing it
-                System.out.println("URL: " + url + " : " + processingTime + "ms, " + executionCount + " times executed");
+                boolean hasSubCalls = false;
+                StringBuilder subCalls = new StringBuilder();
+                subCalls.append("[");
+                for (Map.Entry<String, ExecutionInfo> detail : executionInfo.getDetails().entrySet()) {
+                    subCalls.append(detail.getKey());
+                    subCalls.append(": ");
+                    subCalls.append(detail.getValue().getExecutionCount());
+                    hasSubCalls = true;
+                }
+                if (hasSubCalls) {
+                    subCalls.setLength(subCalls.length() - 2);
+                }
+                subCalls.append("]");
+                String subCallsString = hasSubCalls ? subCalls.toString() : "";
+
+                System.out.println("URL: " + url + " : " + processingTime + "ms, " + executionCount + " times executed " + subCallsString);
             }
         }
 

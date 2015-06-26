@@ -1,4 +1,4 @@
-package com.ghx.hackaton.analytcis.agent;
+package com.ghx.hackaton.analytcis.agent.commons;
 
 /**
  * Created by achumakov on 6/23/2015.

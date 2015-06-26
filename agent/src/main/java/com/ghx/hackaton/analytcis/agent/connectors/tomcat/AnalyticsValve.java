@@ -1,5 +1,6 @@
-package com.ghx.hackaton.analytcis.agent;
+package com.ghx.hackaton.analytcis.agent.connectors.tomcat;
 
+import com.ghx.hackaton.analytcis.agent.logger.RequestLogger;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
@@ -9,7 +10,7 @@ import java.io.IOException;
 
 /**
  *
- * Should be registered in server.xml as <Valve className="com.ghx.hackaton.analytcis.agent.AnalyticsValve" /> in <Engine> section
+ * Should be registered in server.xml as <Valve className="com.ghx.hackaton.analytcis.agent.connectors.tomcat.AnalyticsValve" /> in <Engine> section
  * Created by achumakov on 6/15/2015.
  */
 public class AnalyticsValve extends ValveBase {
