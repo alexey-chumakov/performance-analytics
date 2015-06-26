@@ -16,7 +16,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class RequestLogger {
 
-    private static RequestLogger requestLogger = new RequestLogger();
+    private static RequestLogger requestLogger;
+
+    private static long evictionTime = 30L;
 
     private SimpleExecutionInfoHolder requestStats = new SimpleExecutionInfoHolder();
 
@@ -25,14 +27,21 @@ public class RequestLogger {
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
 
     public RequestLogger() {
-        executorService.scheduleAtFixedRate(new EventEvictionThread(), 30, 30, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new EventEvictionThread(), evictionTime, evictionTime, TimeUnit.SECONDS);
     }
 
-    public static RequestLogger getInstance() {
+    public static void setEvictionTime(long time) {
+        evictionTime = time;
+    }
+
+    public static synchronized RequestLogger getInstance() {
+        if (requestLogger == null) {
+            requestLogger = new RequestLogger();
+        }
         return requestLogger;
     }
 
-    public void logRequest(String url, Long processingTime) {
+    public void logRequestCompleted(String url, Long processingTime) {
         try {
             ExecutionInfo info = getExecutionInfo(url);
             info.increaseExecutionTimes(processingTime);
@@ -69,7 +78,7 @@ public class RequestLogger {
         return requestStats.getExecutionInfoForKey(url);
     }
 
-    private class EventEvictionThread implements Runnable {
+    protected class EventEvictionThread implements Runnable {
 
         public void run() {
             try {
@@ -79,7 +88,7 @@ public class RequestLogger {
             }
         }
 
-        private void evictEvents() {
+        protected void evictEvents() {
             HashMap<String, ExecutionInfo> loggedRequests = requestStats.getAndCleanup();
             for (Map.Entry<String, ExecutionInfo> entry : loggedRequests.entrySet()) {
                 String url = entry.getKey();
@@ -89,23 +98,30 @@ public class RequestLogger {
                 float processingTime = executionTimeTotal / executionCount;
 
                 // FIXME send data instead of printing it
-                boolean hasSubCalls = false;
-                StringBuilder subCalls = new StringBuilder();
-                subCalls.append("[");
-                for (Map.Entry<String, ExecutionInfo> detail : executionInfo.getDetails().entrySet()) {
-                    subCalls.append(detail.getKey());
-                    subCalls.append(": ");
-                    subCalls.append(detail.getValue().getExecutionCount());
-                    hasSubCalls = true;
-                }
-                if (hasSubCalls) {
-                    subCalls.setLength(subCalls.length() - 2);
-                }
-                subCalls.append("]");
-                String subCallsString = hasSubCalls ? subCalls.toString() : "";
+                String subCallsString = getSubCallString(executionInfo);
 
                 System.out.println("URL: " + url + " : " + processingTime + "ms, " + executionCount + " times executed " + subCallsString);
             }
+        }
+
+        private String getSubCallString(ExecutionInfo executionInfo) {
+            if (executionInfo.getDetails() == null || executionInfo.getDetails().isEmpty()) {
+                return "";
+            }
+            StringBuilder subCalls = new StringBuilder();
+            for (Map.Entry<String, ExecutionInfo> detail : executionInfo.getDetails().entrySet()) {
+                subCalls.append("[");
+                subCalls.append(detail.getKey());
+                subCalls.append(": ");
+                subCalls.append(detail.getValue().getExecutionCount());
+                subCalls.append(" time(s), ");
+                subCalls.append(detail.getValue().getExecutionTimeTotal() / detail.getValue().getExecutionCount());
+                subCalls.append(" ms avg");
+                subCalls.append("]");
+                subCalls.append(", ");
+            }
+            subCalls.setLength(subCalls.length() - 2);
+            return subCalls.toString();
         }
 
     }
