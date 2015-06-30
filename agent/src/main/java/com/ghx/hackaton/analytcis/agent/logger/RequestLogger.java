@@ -53,10 +53,12 @@ public class RequestLogger {
         }
     }
 
-    public void logExternalSystemUsage(ExternalSystemType type, Long processingTime) {
+    public void logExternalSystemUsage(ExternalSystemType type, long processingTime) {
         try {
             ExecutionInfo info = threadLocalStats.getExecutionInfoForKey(type.name());
             info.increaseExecutionTimes(processingTime);
+
+            System.out.println("Mongo " + type + " " + processingTime);
         } catch (Exception e) {
             // Avoid any interruption in request processing
             e.printStackTrace();

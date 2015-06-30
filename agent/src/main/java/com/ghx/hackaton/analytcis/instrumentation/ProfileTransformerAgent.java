@@ -3,7 +3,6 @@ package com.ghx.hackaton.analytcis.instrumentation;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
-import java.io.IOException;
 import java.security.ProtectionDomain;
 import java.util.*;
 
@@ -14,6 +13,8 @@ import javassist.*;
  */
 public class ProfileTransformerAgent implements ClassFileTransformer {
 
+    public static final String BEFORE_CODE = "start = System.currentTimeMillis();";
+    public static final String AFTER_CODE = "com.ghx.hackaton.analytcis.agent.logger.RequestLogger.getInstance().logExternalSystemUsage(com.ghx.hackaton.analytcis.agent.commons.ExternalSystemType.MONGO_DB, System.currentTimeMillis() - start);";
     private ClassPool classPool;
 
     private Map<String, Set<Method>> methodsToProfile = new HashMap<String, Set<Method>>();
@@ -31,12 +32,17 @@ public class ProfileTransformerAgent implements ClassFileTransformer {
         methodsToProfile.put("com.mongodb.DBTCPConnector", new HashSet<Method>(Arrays.asList(
                 new Method("doOperation",
                         "(Lcom/mongodb/DB;Lcom/mongodb/DBPort;Lcom/mongodb/DBPort$Operation;)Ljava/lang/Object;", variables,
-                        "start = System.currentTimeMillis();",
-                        "com.ghx.hackaton.analytcis.agent.logger.RequestLogger.logExternalSystemUsage(com.ghx.hackaton.analytcis.agent.commons.ExternalSystemType.MONGO_DB, System.currentTimeMillis() - start);"),
+                        BEFORE_CODE, AFTER_CODE),
                 new Method("call",
                         "(Lcom/mongodb/DB;Lcom/mongodb/DBCollection;Lcom/mongodb/OutMessage;Lcom/mongodb/ServerAddress;ILcom/mongodb/ReadPreference;Lcom/mongodb/DBDecoder;)Lcom/mongodb/Response;",
-                        variables, "start = System.currentTimeMillis();",
-                        "com.ghx.hackaton.analytcis.agent.logger.RequestLogger.logExternalSystemUsage(com.ghx.hackaton.analytcis.agent.commons.ExternalSystemType.MONGO_DB, System.currentTimeMillis() - start);"))));
+                        variables, BEFORE_CODE, AFTER_CODE))));
+        methodsToProfile.put("com.mongodb.Mongo", new HashSet<Method>(Arrays.asList(
+                new Method("execute",
+                        "(Lcom/mongodb/operation/WriteOperation;)Ljava/lang/Object;", variables,
+                        BEFORE_CODE, AFTER_CODE),
+                new Method("execute",
+                        "(Lcom/mongodb/operation/ReadOperation;Lcom/mongodb/ReadPreference;)Ljava/lang/Object;",
+                        variables, BEFORE_CODE, AFTER_CODE))));
     }
 
     public byte[] transform(ClassLoader loader, String className, Class classBeingRedefined,
