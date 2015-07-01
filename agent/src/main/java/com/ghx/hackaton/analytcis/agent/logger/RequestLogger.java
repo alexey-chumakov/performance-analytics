@@ -57,8 +57,6 @@ public class RequestLogger {
         try {
             ExecutionInfo info = threadLocalStats.getExecutionInfoForKey(type.name());
             info.increaseExecutionTimes(processingTime);
-
-            System.out.println("Mongo " + type + " " + processingTime);
         } catch (Exception e) {
             // Avoid any interruption in request processing
             e.printStackTrace();
