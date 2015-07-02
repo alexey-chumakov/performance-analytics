@@ -41,6 +41,7 @@ public class HibernateConfig {
         ds.setDriverClassName("com.mysql.jdbc.Driver");
         ds.setUrl("jdbc:mysql://localhost:3306/performance_analytics");
         ds.setUsername("root");
+        ds.setPassword("mypass");
         return ds;
     }
 

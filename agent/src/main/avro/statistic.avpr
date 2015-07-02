@@ -1,0 +1,22 @@
+{
+    "namespace": "com.ghx.hackaton.analytcis",
+     "protocol": "Statistics",
+
+     "types": [
+         {"name": "ExecutionInfoBean", "type": "record",
+          "fields": [
+              {"name": "executionCount", "type": "int"},
+              {"name": "executionTimeTotal", "type": "long"},
+              {"name": "sendTime", "type": "long"},
+              {"name": "details", "type" : {"type": "map", "values": "ExecutionInfoBean"}}
+          ]
+         }
+     ],
+
+     "messages": {
+         "send": {
+             "request": [{"name": "info", "type": {"type": "map", "values": "ExecutionInfoBean"}}],
+             "response": "string"
+         }
+     }
+}

@@ -4,6 +4,8 @@ import com.ghx.hackaton.analytcis.agent.logger.base.ExecutionInfo;
 import com.ghx.hackaton.analytcis.agent.logger.base.SimpleExecutionInfoHolder;
 import com.ghx.hackaton.analytcis.agent.logger.base.ThreadLocalExecutionInfoHolder;
 import com.ghx.hackaton.analytcis.agent.commons.ExternalSystemType;
+import com.ghx.hackaton.analytcis.agent.sender.AvroSenderImpl;
+import com.ghx.hackaton.analytcis.agent.sender.Sender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,8 +82,11 @@ public class RequestLogger {
 
     protected class EventEvictionThread implements Runnable {
 
+        private Sender sender;
+
         public void run() {
             try {
+                sender = new AvroSenderImpl();
                 evictEvents();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -89,41 +94,8 @@ public class RequestLogger {
         }
 
         protected void evictEvents() {
-            HashMap<String, ExecutionInfo> loggedRequests = requestStats.getAndCleanup();
-            for (Map.Entry<String, ExecutionInfo> entry : loggedRequests.entrySet()) {
-                String url = entry.getKey();
-                ExecutionInfo executionInfo = entry.getValue();
-                int executionCount = executionInfo.getExecutionCount();
-                long executionTimeTotal = executionInfo.getExecutionTimeTotal();
-                float processingTime = executionTimeTotal / executionCount;
-
-                // FIXME send data instead of printing it
-                String subCallsString = getSubCallString(executionInfo);
-
-                System.out.println("URL: " + url + " : " + processingTime + "ms, " + executionCount + " times executed " + subCallsString);
-            }
+            sender.send(requestStats.getAndCleanup());
         }
-
-        private String getSubCallString(ExecutionInfo executionInfo) {
-            if (executionInfo.getDetails() == null || executionInfo.getDetails().isEmpty()) {
-                return "";
-            }
-            StringBuilder subCalls = new StringBuilder();
-            for (Map.Entry<String, ExecutionInfo> detail : executionInfo.getDetails().entrySet()) {
-                subCalls.append("[");
-                subCalls.append(detail.getKey());
-                subCalls.append(": ");
-                subCalls.append(detail.getValue().getExecutionCount());
-                subCalls.append(" time(s), ");
-                subCalls.append(detail.getValue().getExecutionTimeTotal() / detail.getValue().getExecutionCount());
-                subCalls.append(" ms avg");
-                subCalls.append("]");
-                subCalls.append(", ");
-            }
-            subCalls.setLength(subCalls.length() - 2);
-            return subCalls.toString();
-        }
-
     }
 
 }

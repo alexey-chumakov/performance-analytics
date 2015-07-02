@@ -12,7 +12,7 @@ import java.util.List;
 public class ModelClientConverter {
 
     public static List<Request> requestsToModel(List<RequestBean> beans) {
-        List<Request> model = new ArrayList<>();
+        List<Request> model = new ArrayList<Request>();
 
         for (RequestBean bean : beans) {
             Request request = new Request();
@@ -34,7 +34,7 @@ public class ModelClientConverter {
     }
 
     public static List<RequestDetails> requestDetailsToModel(List<RequestDetailsBean> beans) {
-        List<RequestDetails> model = new ArrayList<>();
+        List<RequestDetails> model = new ArrayList<RequestDetails>();
 
         for (RequestDetailsBean bean : beans) {
             RequestDetails requestDetails = new RequestDetails();
