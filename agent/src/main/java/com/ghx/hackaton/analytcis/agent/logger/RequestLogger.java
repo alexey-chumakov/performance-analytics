@@ -7,6 +7,8 @@ import com.ghx.hackaton.analytcis.agent.commons.ExternalSystemType;
 import com.ghx.hackaton.analytcis.agent.sender.AvroSenderImpl;
 import com.ghx.hackaton.analytcis.agent.sender.Sender;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,12 +30,28 @@ public class RequestLogger {
 
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
 
+    private String appName;
+
+    private String serverId;
+
     public RequestLogger() {
+        try {
+            serverId = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            serverId = "undefined";
+            e.printStackTrace();
+        }
         executorService.scheduleAtFixedRate(new EventEvictionThread(), evictionTime, evictionTime, TimeUnit.SECONDS);
     }
 
     public static void setEvictionTime(long time) {
         evictionTime = time;
+    }
+
+    public void setAppName(String appName) {
+        if (this.appName == null) {
+            this.appName = appName;
+        }
     }
 
     public static synchronized RequestLogger getInstance() {
@@ -94,7 +112,7 @@ public class RequestLogger {
         }
 
         protected void evictEvents() {
-            sender.send(requestStats.getAndCleanup());
+            sender.send(appName, serverId, requestStats.getAndCleanup());
         }
     }
 

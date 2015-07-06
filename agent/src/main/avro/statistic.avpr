@@ -15,7 +15,11 @@
 
      "messages": {
          "send": {
-             "request": [{"name": "info", "type": {"type": "map", "values": "ExecutionInfoBean"}}],
+             "request": [
+                {"name": "info", "type": {"type": "map", "values": "ExecutionInfoBean"}},
+                {"name": "appName", "type": "string"},
+                {"name": "serverId", "type": "string"}
+             ],
              "response": "string"
          }
      }

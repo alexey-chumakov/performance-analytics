@@ -14,7 +14,6 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
-import java.io.IOException;
 
 public class WebAppInitializer implements WebApplicationInitializer {
 
@@ -34,10 +33,10 @@ public class WebAppInitializer implements WebApplicationInitializer {
         dispatcher.addMapping("/");
 
         try {
-            ServletRegistration.Dynamic avroResponder = container.addServlet("avroResponder", new ResponderServlet(new SpecificResponder(Statistics.class, new StatisticsReceiver())));
+            ServletRegistration.Dynamic avroResponder = container.addServlet("avroResponder", new ResponderServlet(new SpecificResponder(Statistics.class, new StatisticsReceiver(rootContext))));
             avroResponder.setLoadOnStartup(1);
             avroResponder.addMapping("/avro/*");
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Failed to initialize avro responder servlet. " + e.toString());
         }
     }

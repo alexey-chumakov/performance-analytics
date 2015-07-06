@@ -28,7 +28,7 @@ public class AvroSenderImpl implements Sender {
         client = SpecificRequestor.getClient(Statistics.class, transceiver);
     }
 
-    public void send(Map<String, ExecutionInfo> info) {
+    public void send(String appName, String serverId, Map<String, ExecutionInfo> info) {
         Map<CharSequence, ExecutionInfoBean> result = new HashMap<CharSequence, ExecutionInfoBean>();
         for (String key : info.keySet()) {
             ExecutionInfo executionInfo = info.get(key);
@@ -44,7 +44,7 @@ public class AvroSenderImpl implements Sender {
         }
         try {
             if (result.size() > 0) {
-                client.send(result);
+                client.send(result, appName, serverId);
             }
         } catch (AvroRemoteException e) {
             System.err.println("Failed to send execution statistics. " + e.toString());

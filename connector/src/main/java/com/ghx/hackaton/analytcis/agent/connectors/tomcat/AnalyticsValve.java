@@ -20,6 +20,7 @@ public class AnalyticsValve extends ValveBase {
         long start = System.currentTimeMillis();
         getNext().invoke(request, response);
         long end = System.currentTimeMillis();
+        RequestLogger.getInstance().setAppName(request.getContextPath());
         RequestLogger.getInstance().logRequestCompleted(request.getRequestURL().toString(), end - start);
     }
 }
