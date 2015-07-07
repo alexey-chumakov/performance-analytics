@@ -3,9 +3,9 @@ package com.ghx.hackaton.analytics.dao.impl;
 import com.ghx.hackaton.analytics.dao.RequestDAO;
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.util.DateUtil;
-import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Repository;
 
@@ -16,28 +16,69 @@ import java.util.List;
 public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements RequestDAO {
 
     @Override
-    public List<Request> find(Date from, Date to) {
-        Criteria criteria = getSession().createCriteria(getClazz());
-        criteria.add(Restrictions.between("year", DateUtil.year(from), DateUtil.year(to)));
-        criteria.add(Restrictions.between("month", DateUtil.month(from), DateUtil.month(to)));
-        criteria.add(Restrictions.between("day", DateUtil.dayOfMonth(from), DateUtil.dayOfMonth(to)));
-        criteria.add(Restrictions.between("hour", DateUtil.hourOfDay(from), DateUtil.hourOfDay(to)));
+    public int updateRequest(Request request) {
+        Query query = getSession().getNamedQuery(Request.UPDATE_QUERY);
+        query.setLong("newCount", request.getCount());
+        query.setLong("newDuration", request.getDuration());
+        query.setInteger("year", request.getYear());
+        query.setInteger("month", request.getMonth());
+        query.setInteger("day", request.getDay());
+        query.setInteger("hour", request.getHour());
+        query.setInteger("minute", request.getMinute());
+        query.setString("appName", request.getAppName());
+        query.setString("serverId", request.getServerId());
+        query.setString("url", request.getUrl());
 
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.groupProperty("url").as("url"))
-                .add(Projections.groupProperty("serverId").as("serverId"))
-                .add(Projections.groupProperty("appName").as("appName"))
-                .add(Projections.groupProperty("year").as("year"))
-                .add(Projections.groupProperty("month").as("month"))
-                .add(Projections.groupProperty("day").as("day"))
-                .add(Projections.groupProperty("hour").as("hour"))
-                .add(Projections.sum("count").as("count"))
-                .add(Projections.sum("duration").as("duration"))
-        );
-
-        criteria.setResultTransformer(Transformers.aliasToBean(getClazz()));
-
-        return criteria.list();
+        return query.executeUpdate();
     }
 
+    @Override
+    public List<Request> find(Date from, Date to) {
+        Query query = getSession().getNamedQuery(Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY);
+        query.setInteger("fromYear", DateUtil.year(from));
+        query.setInteger("toYear", DateUtil.year(to));
+        query.setInteger("fromMonth", DateUtil.month(from));
+        query.setInteger("toMonth", DateUtil.month(to));
+        query.setInteger("fromDay", DateUtil.dayOfMonth(from));
+        query.setInteger("toDay", DateUtil.dayOfMonth(to));
+        query.setResultTransformer(Transformers.aliasToBean(getClazz()));
+
+        return query.list();
+    }
+
+    @Override
+    public Long findIdByExample(Request request) {
+        Example example = Example.create(request);
+        example.excludeProperty("id");
+        example.excludeProperty("count");
+        example.excludeProperty("duration");
+
+        return (Long) getSession()
+                .createCriteria(getClazz())
+                .add(example)
+                .setProjection(Projections.property("id"))
+                .uniqueResult();
+    }
+
+    @Override
+    public void delete(Date from, Date to) {
+        Query query = getSession().getNamedQuery(Request.DELETE_BY_DATE_RANGE_QUERY);
+        query.setInteger("fromYear", DateUtil.year(from));
+        query.setInteger("toYear", DateUtil.year(to));
+        query.setInteger("fromMonth", DateUtil.month(from));
+        query.setInteger("toMonth", DateUtil.month(to));
+        query.setInteger("fromDay", DateUtil.dayOfMonth(from));
+        query.setInteger("toDay", DateUtil.dayOfMonth(to));
+
+        query.executeUpdate();
+    }
+
+    @Override
+    public void update(Request request) {
+        Query query = getSession().getNamedQuery(Request.UPDATE_QUERY);
+        query.setInteger("year", DateUtil.year(request.getYear()));
+        query.setInteger("month", DateUtil.year(request.getMonth()));
+        query.setInteger("day", DateUtil.year(request.getDay()));
+
+    }
 }

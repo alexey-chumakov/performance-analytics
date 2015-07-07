@@ -10,15 +10,40 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-        @NamedQuery(name = RequestDetails.SELECT_BY_REQUEST_QUERY,
-                query = "from RequestDetails rd where rd.request.id = :id")
+        @NamedQuery(name = RequestDetails.SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY,
+                query = "select " +
+                        "rd.systemName as systemName, " +
+                        "sum(rd.count) as count, " +
+                        "sum(rd.duration) as duration " +
+                        "from RequestDetails rd join rd.request r " +
+                        "where :fromYear <= r.year and r.year <= :toYear " +
+                        "and :fromMonth <= r.month and r.month <= :toMonth " +
+                        "and :fromDay <= r.day and r.day <= :toDay " +
+                        "and r.appName = :appName and r.serverId = :serverId " +
+                        "and r.url = :url " +
+                        "group by rd.systemName"),
+
+        @NamedQuery(name = RequestDetails.UPDATE_QUERY,
+                query = "update RequestDetails rd set rd.count = rd.count + :newCount, rd.duration = rd.duration + :newDuration " +
+                        "where rd.systemName = :systemName " +
+                        "and rd.request.id = :requestId"),
+
+        @NamedQuery(name = RequestDetails.DELETE_BY_REQUEST_DATE_RANGE,
+                query = "delete from RequestDetails rd " +
+                        "where rd.request.id in " +
+                        "(select r.id from Request r " +
+                        "where :fromYear <= r.year and r.year <= :toYear" +
+                        " and :fromMonth <= r.month and r.month <= :toMonth " +
+                        "and :fromDay <= r.day and r.day <= :toDay)")
 })
 
 @Entity
 @Table(name = "REQUEST_DETAILS")
 public class RequestDetails extends AbstractEntity {
 
-    public static final String SELECT_BY_REQUEST_QUERY = "RequestDetails.SELECT_BY_REQUEST_QUERY";
+    public static final String SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY = "RequestDetails.SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY";
+    public static final String UPDATE_QUERY = "RequestDetails.UPDATE_QUERY";
+    public static final String DELETE_BY_REQUEST_DATE_RANGE = "RequestDetails.DELETE_BY_REQUEST_DATE_RANGE";
 
     @Column(name = "SYSTEM_NAME", nullable = false)
     private String systemName;

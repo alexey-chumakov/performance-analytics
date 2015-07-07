@@ -1,7 +1,9 @@
 package com.ghx.hackaton.analytics.service.impl;
 
 import com.ghx.hackaton.analytics.dao.RequestDAO;
+import com.ghx.hackaton.analytics.dao.RequestDetailsDAO;
 import com.ghx.hackaton.analytics.model.Request;
+import com.ghx.hackaton.analytics.model.RequestDetails;
 import com.ghx.hackaton.analytics.service.RequestService;
 import com.ghx.hackaton.analytics.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +17,53 @@ import java.util.List;
 @Transactional
 public class RequestServiceImpl implements RequestService {
 
+    private static int ROUND_MINUTES = 5;
+
     @Autowired
     private RequestDAO requestDAO;
+    @Autowired
+    private RequestDetailsDAO requestDetailsDAO;
 
     @Override
-    public void save(List<Request> requests) {
-        requestDAO.save(requests);
+    public void saveOrUpdate(List<Request> requests) {
+        for (Request request : requests) {
+            roundMinutes(request);
+            Long existentId = requestDAO.findIdByExample(request);
+            if (existentId != null) {
+                request.setId(existentId);
+                requestDAO.updateRequest(request);
+                updateDetails(request.getDetails());
+            } else {
+                requestDAO.save(request);
+            }
+        }
+    }
+
+    private void roundMinutes(Request request) {
+        if (request.getMinute() != null) {
+            request.setMinute(request.getMinute() - request.getMinute() % ROUND_MINUTES);
+        }
+    }
+
+    private void updateDetails(List<RequestDetails> requestDetails) {
+        if (requestDetails != null) {
+            for (RequestDetails requestDetail : requestDetails) {
+                int updated = requestDetailsDAO.updateRequestDetails(requestDetail);
+                if (updated == 0) {
+                    requestDetailsDAO.save(requestDetail);
+                }
+            }
+        }
     }
 
     @Override
     public List<Request> find(Date from, Date to) {
         return requestDAO.find(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to));
+    }
+
+    @Override
+    public void delete(Date from, Date to) {
+        requestDetailsDAO.delete(from, to);
+        requestDAO.delete(from, to);
     }
 }

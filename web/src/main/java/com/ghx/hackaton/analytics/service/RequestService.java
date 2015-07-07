@@ -7,8 +7,10 @@ import java.util.List;
 
 public interface RequestService {
 
-    void save(List<Request> requests);
+    void saveOrUpdate(List<Request> requests);
 
     List<Request> find(Date from, Date to);
+
+    void delete(Date from, Date to);
 
 }

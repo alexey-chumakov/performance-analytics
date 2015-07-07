@@ -33,7 +33,7 @@ public class StatisticsReceiver implements Statistics {
         if (requestService == null) {
             requestService = (RequestService)context.getBean("requestServiceImpl");
         }
-        requestService.save(requestsToModel(info, appName.toString(), serverId.toString()));
+        requestService.saveOrUpdate(requestsToModel(info, appName.toString(), serverId.toString()));
         return "ok";
     }
 

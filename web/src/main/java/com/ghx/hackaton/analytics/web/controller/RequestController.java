@@ -26,7 +26,7 @@ public class RequestController {
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public void save(List<RequestBean> requests) {
-        requestService.save(ModelClientConverter.requestsToModel(requests));
+        requestService.saveOrUpdate(ModelClientConverter.requestsToModel(requests));
     }
 
     @RequestMapping(value = "/forPeriod")

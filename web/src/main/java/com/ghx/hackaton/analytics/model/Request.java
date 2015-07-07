@@ -2,16 +2,52 @@ package com.ghx.hackaton.analytics.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
+@NamedQueries({
+        @NamedQuery(name = Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY,
+                query = "select " +
+                        "r.year as year, " +
+                        "r.month as month, " +
+                        "r.day as day, " +
+                        "r.hour as hour, " +
+                        "r.appName as appName, " +
+                        "r.serverId as serverId, " +
+                        "r.url as url, " +
+                        "sum(r.count) as count, " +
+                        "sum(r.duration) as duration " +
+                        "from Request r " +
+                        "where :fromYear <= r.year and r.year <= :toYear " +
+                        "and :fromMonth <= r.month and r.month <= :toMonth " +
+                        "and :fromDay <= r.day and r.day <= :toDay " +
+                        "group by r.year, r.month, r.day, r.hour, r.appName, r.serverId, r.url"),
+
+        @NamedQuery(name = Request.UPDATE_QUERY,
+                query = "update Request r set r.count = r.count + :newCount, r.duration = r.duration + :newDuration " +
+                        "where r.year = :year and r.month = :month " +
+                        "and r.day = :day and r.hour = :hour " +
+                        "and r.minute = :minute and r.appName = :appName " +
+                        "and r.serverId = :serverId and r.url = :url"),
+
+        @NamedQuery(name = Request.DELETE_BY_DATE_RANGE_QUERY,
+                query = "delete Request r " +
+                        "where :fromYear <= r.year and r.year <= :toYear " +
+                        "and :fromMonth <= r.month and r.month <= :toMonth " +
+                        "and :fromDay <= r.day and r.day <= :toDay")
+})
 @Entity
 @Table(name = "REQUEST")
 public class Request extends AbstractEntity {
+
+    public static final String SELECT_AGGREGATED_BY_DATE_RANGE_QUERY = "Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY";
+    public static final String UPDATE_QUERY = "Request.UPDATE_QUERY";
+    public static final String DELETE_BY_DATE_RANGE_QUERY = "Request.DELETE_BY_DATE_RANGE_QUERY";
 
     @Column(name = "YEAR", nullable = false)
     private Integer year;
