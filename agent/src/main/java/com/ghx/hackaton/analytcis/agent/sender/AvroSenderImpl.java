@@ -11,21 +11,26 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Alexey Sheukun <asheukun@exadel.com> on 01.07.2015.
  */
 public class AvroSenderImpl implements Sender {
-
-    //FIXME move to properties
-    private static final String SERVER_URL = "http://localhost:8082/avro";
-    private static final int SERVER_PORT = 65111;
-
     private Statistics client;
 
     public AvroSenderImpl() throws IOException {
-        HttpTransceiver transceiver = new HttpTransceiver(new URL(SERVER_URL));
-        client = SpecificRequestor.getClient(Statistics.class, transceiver);
+        Properties prop = new Properties();
+        try {
+            prop.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
+
+            HttpTransceiver transceiver = new HttpTransceiver(new URL(prop.getProperty("server.url")));
+            client = SpecificRequestor.getClient(Statistics.class, transceiver);
+
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void send(String appName, String serverId, Map<String, ExecutionInfo> info) {
