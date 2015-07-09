@@ -39,9 +39,9 @@ public class HibernateConfig {
     public DataSource dataSource() {
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName("com.mysql.jdbc.Driver");
-        ds.setUrl("jdbc:mysql://localhost:3306/performance_analytics");
-        ds.setUsername("root");
-        ds.setPassword("mypass");
+        ds.setUrl("jdbc:mysql://192.168.0.137:3306/ghx-hackaton");
+        ds.setUsername("ghx_hackaton");
+        ds.setPassword("ghx_hackaton");
         return ds;
     }
 
