@@ -32,9 +32,7 @@ import javax.persistence.Table;
                 query = "delete from RequestDetails rd " +
                         "where rd.request.id in " +
                         "(select r.id from Request r " +
-                        "where :fromYear <= r.year and r.year <= :toYear" +
-                        " and :fromMonth <= r.month and r.month <= :toMonth " +
-                        "and :fromDay <= r.day and r.day <= :toDay)")
+                        "where :fromDate <= r.timestamp and r.timestamp <= :toDate)")
 })
 
 @Entity

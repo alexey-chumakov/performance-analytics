@@ -66,7 +66,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void delete(Date from, Date to) {
-        requestDetailsDAO.delete(from, to);
-        requestDAO.delete(from, to);
+        requestDetailsDAO.delete(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to));
+        requestDAO.delete(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to));
     }
 }

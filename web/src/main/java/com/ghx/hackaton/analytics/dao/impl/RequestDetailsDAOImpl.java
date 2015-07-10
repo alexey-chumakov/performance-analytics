@@ -46,12 +46,8 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
     @Override
     public void delete(Date from, Date to) {
         Query query = getSession().getNamedQuery(RequestDetails.DELETE_BY_REQUEST_DATE_RANGE);
-        query.setInteger("fromYear", DateUtil.year(from));
-        query.setInteger("toYear", DateUtil.year(to));
-        query.setInteger("fromMonth", DateUtil.month(from));
-        query.setInteger("toMonth", DateUtil.month(to));
-        query.setInteger("fromDay", DateUtil.dayOfMonth(from));
-        query.setInteger("toDay", DateUtil.dayOfMonth(to));
+        query.setLong("fromDate", from.getTime());
+        query.setLong("toDate", to.getTime());
 
         query.executeUpdate();
     }

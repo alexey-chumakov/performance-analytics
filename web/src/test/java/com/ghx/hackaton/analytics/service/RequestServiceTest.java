@@ -36,7 +36,7 @@ public class RequestServiceTest  {
 
     @BeforeClass
     public static void init() throws ParseException {
-        TEST_DATE = new SimpleDateFormat(TEST_DATE_FORMAT).parse("1900-01-01 13:03");
+        TEST_DATE = new SimpleDateFormat(TEST_DATE_FORMAT).parse("1990-01-01 13:03");
     }
 
     @Before
@@ -85,6 +85,7 @@ public class RequestServiceTest  {
 
     private Request createRequest(Date date, String appName, String serverId, String url, long count, long duration) {
         Request request = new Request();
+        request.setTimestamp(date.getTime());
         request.setYear(DateUtil.year(date));
         request.setMonth(DateUtil.month(date));
         request.setDay(DateUtil.dayOfMonth(date));
