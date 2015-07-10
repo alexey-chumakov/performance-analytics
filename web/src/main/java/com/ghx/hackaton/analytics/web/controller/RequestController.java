@@ -1,15 +1,19 @@
 package com.ghx.hackaton.analytics.web.controller;
 
+import com.ghx.hackaton.analytics.model.Request;
+import com.ghx.hackaton.analytics.model.RequestDetails;
+import com.ghx.hackaton.analytics.service.RequestDetailsService;
 import com.ghx.hackaton.analytics.service.RequestService;
 import com.ghx.hackaton.analytics.web.bean.RequestBean;
 import com.ghx.hackaton.analytics.web.converter.ModelClientConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Calendar;
 import java.util.List;
@@ -18,11 +22,12 @@ import java.util.List;
 @RequestMapping("/request")
 public class RequestController {
 
-    private static final String MODEL = "requests";
     private static final String UI_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private RequestDetailsService requestDetailsService;
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public void save(List<RequestBean> requests) {
@@ -30,12 +35,21 @@ public class RequestController {
     }
 
     @RequestMapping(value = "/forPeriod")
-    public ModelAndView getRequests(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+    @ResponseBody
+    public List<Request> getRequests(@DateTimeFormat(pattern = UI_DATE_FORMAT)
                                     @RequestParam Calendar startDate,
                                     @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                     @RequestParam Calendar endDate) {
-        ModelAndView modelAndView = new ModelAndView("request-list");
-        modelAndView.addObject(MODEL, requestService.find(startDate.getTime(), endDate.getTime()));
-        return modelAndView;
+        return requestService.find(startDate.getTime(), endDate.getTime());
+    }
+
+    @RequestMapping(value = "/details")
+    @ResponseBody
+    public List<RequestDetails> getRequestDetails(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                     @RequestParam Calendar startDate,
+                                     @DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                     @RequestParam Calendar endDate,
+                                     @ModelAttribute Request request) {
+        return requestDetailsService.findByRequest(startDate.getTime(), endDate.getTime(), request);
     }
 }
