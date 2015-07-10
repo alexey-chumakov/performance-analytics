@@ -44,6 +44,7 @@ public class StatisticsReceiver implements Statistics {
             ExecutionInfoBean bean = info.get(key);
 
             Request request = new Request();
+            request.setTimestamp(bean.getSendTime());
             request.setYear(DateUtil.year(bean.getSendTime()));
             request.setMonth(DateUtil.month(bean.getSendTime()));
             request.setDay(DateUtil.dayOfMonth(bean.getSendTime()));

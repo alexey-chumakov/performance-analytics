@@ -23,9 +23,7 @@ import java.util.List;
                         "sum(r.count) as count, " +
                         "sum(r.duration) as duration " +
                         "from Request r " +
-                        "where :fromYear <= r.year and r.year <= :toYear " +
-                        "and :fromMonth <= r.month and r.month <= :toMonth " +
-                        "and :fromDay <= r.day and r.day <= :toDay " +
+                        "where :fromDate <= r.timestamp and r.timestamp <= :toDate " +
                         "group by r.year, r.month, r.day, r.hour, r.appName, r.serverId, r.url"),
 
         @NamedQuery(name = Request.UPDATE_QUERY,
@@ -37,9 +35,7 @@ import java.util.List;
 
         @NamedQuery(name = Request.DELETE_BY_DATE_RANGE_QUERY,
                 query = "delete Request r " +
-                        "where :fromYear <= r.year and r.year <= :toYear " +
-                        "and :fromMonth <= r.month and r.month <= :toMonth " +
-                        "and :fromDay <= r.day and r.day <= :toDay")
+                        "where :fromDate <= r.timestamp and r.timestamp <= :toDate")
 })
 @Entity
 @Table(name = "REQUEST")
@@ -48,6 +44,9 @@ public class Request extends AbstractEntity {
     public static final String SELECT_AGGREGATED_BY_DATE_RANGE_QUERY = "Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY";
     public static final String UPDATE_QUERY = "Request.UPDATE_QUERY";
     public static final String DELETE_BY_DATE_RANGE_QUERY = "Request.DELETE_BY_DATE_RANGE_QUERY";
+
+    @Column(name = "TIMESTAMP", nullable = false)
+    private Long timestamp;
 
     @Column(name = "YEAR", nullable = false)
     private Integer year;
@@ -81,6 +80,14 @@ public class Request extends AbstractEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "request")
     private List<RequestDetails> details;
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public Integer getYear() {
         return year;

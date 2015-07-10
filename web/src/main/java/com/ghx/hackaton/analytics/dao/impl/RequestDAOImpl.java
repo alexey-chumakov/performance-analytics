@@ -35,12 +35,8 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     @Override
     public List<Request> find(Date from, Date to) {
         Query query = getSession().getNamedQuery(Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY);
-        query.setInteger("fromYear", DateUtil.year(from));
-        query.setInteger("toYear", DateUtil.year(to));
-        query.setInteger("fromMonth", DateUtil.month(from));
-        query.setInteger("toMonth", DateUtil.month(to));
-        query.setInteger("fromDay", DateUtil.dayOfMonth(from));
-        query.setInteger("toDay", DateUtil.dayOfMonth(to));
+        query.setLong("fromDate", from.getTime());
+        query.setLong("toDate", to.getTime());
         query.setResultTransformer(Transformers.aliasToBean(getClazz()));
 
         return query.list();
@@ -50,6 +46,7 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     public Long findIdByExample(Request request) {
         Example example = Example.create(request);
         example.excludeProperty("id");
+        example.excludeProperty("timestamp");
         example.excludeProperty("count");
         example.excludeProperty("duration");
 
@@ -63,22 +60,10 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     @Override
     public void delete(Date from, Date to) {
         Query query = getSession().getNamedQuery(Request.DELETE_BY_DATE_RANGE_QUERY);
-        query.setInteger("fromYear", DateUtil.year(from));
-        query.setInteger("toYear", DateUtil.year(to));
-        query.setInteger("fromMonth", DateUtil.month(from));
-        query.setInteger("toMonth", DateUtil.month(to));
-        query.setInteger("fromDay", DateUtil.dayOfMonth(from));
-        query.setInteger("toDay", DateUtil.dayOfMonth(to));
+        query.setLong("fromDate", from.getTime());
+        query.setLong("toDate", to.getTime());
 
         query.executeUpdate();
     }
 
-    @Override
-    public void update(Request request) {
-        Query query = getSession().getNamedQuery(Request.UPDATE_QUERY);
-        query.setInteger("year", DateUtil.year(request.getYear()));
-        query.setInteger("month", DateUtil.year(request.getMonth()));
-        query.setInteger("day", DateUtil.year(request.getDay()));
-
-    }
 }

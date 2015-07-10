@@ -43,6 +43,9 @@ public class RequestServiceImpl implements RequestService {
         if (request.getMinute() != null) {
             request.setMinute(request.getMinute() - request.getMinute() % ROUND_MINUTES);
         }
+        if (request.getTimestamp() != null) {
+            request.setTimestamp(request.getTimestamp() - request.getTimestamp() % (1000 * 60 * ROUND_MINUTES));
+        }
     }
 
     private void updateDetails(List<RequestDetails> requestDetails) {
