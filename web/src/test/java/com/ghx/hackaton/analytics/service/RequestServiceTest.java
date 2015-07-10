@@ -4,7 +4,7 @@ import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
 import com.ghx.hackaton.analytics.spring.TestConfig;
 import com.ghx.hackaton.analytics.util.DateUtil;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
