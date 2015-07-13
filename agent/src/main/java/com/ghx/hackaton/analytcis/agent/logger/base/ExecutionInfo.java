@@ -36,6 +36,9 @@ public class ExecutionInfo {
     }
 
     public void addDetails(Map<String, ExecutionInfo> newDetails) {
+        // Null check
+        if (newDetails == null) return;
+
         if (details == null) {
             // When adding first details
             details = newDetails;
