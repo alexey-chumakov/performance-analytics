@@ -4,22 +4,25 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class DateUtil {
+
+    private static TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     public static int year(Date date) {
         return year(date.getTime());
     }
 
     public static int year(long timeMillis) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(UTC);
         calendar.setTimeInMillis(timeMillis);
 
         return calendar.get(Calendar.YEAR);
     }
 
     public static int month(long timeMillis) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(UTC);
         calendar.setTimeInMillis(timeMillis);
 
         return calendar.get(Calendar.MONTH) + 1;
@@ -30,7 +33,7 @@ public class DateUtil {
     }
 
     public static int dayOfMonth(long timeMillis) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(UTC);
         calendar.setTimeInMillis(timeMillis);
 
         return calendar.get(Calendar.DAY_OF_MONTH);
@@ -41,7 +44,7 @@ public class DateUtil {
     }
 
     public static int hourOfDay(long timeMillis) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(UTC);
         calendar.setTimeInMillis(timeMillis);
 
         return calendar.get(Calendar.HOUR_OF_DAY);
@@ -52,7 +55,7 @@ public class DateUtil {
     }
 
     public static int minute(long timeMillis) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(UTC);
         calendar.setTimeInMillis(timeMillis);
 
         return calendar.get(Calendar.MINUTE);
