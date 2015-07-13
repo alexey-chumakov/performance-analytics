@@ -9,6 +9,18 @@ public class SimpleExecutionInfoHolder {
 
     private HashMap<String, ExecutionInfo> executionInfoMap = new HashMap<String, ExecutionInfo>();
 
+    public ExecutionInfo getExecutionInfoForKey(String key, String contextPath) {
+        ExecutionInfo info = executionInfoMap.get(key);
+        if (info == null) {
+            info = new ExecutionInfo(contextPath);
+            executionInfoMap.put(key, info);
+        }
+        if (info.getContextPath() == null) {
+            info.setContextPath(contextPath);
+        }
+        return info;
+    }
+
     public ExecutionInfo getExecutionInfoForKey(String key) {
         ExecutionInfo info = executionInfoMap.get(key);
         if (info == null) {

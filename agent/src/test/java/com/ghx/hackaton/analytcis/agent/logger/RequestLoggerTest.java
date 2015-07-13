@@ -34,7 +34,7 @@ public class RequestLoggerTest extends TestCase {
      *
      */
     public void testLogRequest() {
-        logger.logRequestCompleted("test URL", 100L);
+        logger.logRequestCompleted("testPath" ,"test URL", 100L);
         sleep();
     }
 
@@ -45,8 +45,8 @@ public class RequestLoggerTest extends TestCase {
         RequestLogger.setEvictionTime(1);
         RequestLogger logger = RequestLogger.getInstance();
         logger.logExternalSystemUsage(ExternalSystemType.MONGO_DB, 50L);
-        logger.logRequestCompleted("test URL with Mongo", 100L);
-        logger.logRequestCompleted("test URL without Mongo", 50L);
+        logger.logRequestCompleted("testPath" ,"test URL with Mongo", 100L);
+        logger.logRequestCompleted("testPath" ,"test URL without Mongo", 50L);
         sleep();
     }
 

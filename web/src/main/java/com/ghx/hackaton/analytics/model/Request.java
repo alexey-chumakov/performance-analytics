@@ -77,6 +77,9 @@ public class Request extends AbstractEntity {
     @Column(name = "COUNT", nullable = false)
     private Long count;
 
+    @Column(name = "FAILED_COUNT", nullable = false)
+    private Long failedCount;
+
     @Column(name = "DURATION", nullable = false)
     private Long duration;
 
@@ -164,6 +167,14 @@ public class Request extends AbstractEntity {
 
     public void setCount(Long count) {
         this.count = count;
+    }
+
+    public Long getFailedCount() {
+        return failedCount;
+    }
+
+    public void setFailedCount(Long failedCount) {
+        this.failedCount = failedCount;
     }
 
     public Long getDuration() {

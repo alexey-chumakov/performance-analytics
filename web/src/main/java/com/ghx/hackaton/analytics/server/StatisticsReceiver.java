@@ -29,15 +29,15 @@ public class StatisticsReceiver implements Statistics {
     }
 
     @Override
-    public CharSequence send(Map<CharSequence, ExecutionInfoBean> info, CharSequence appName, CharSequence serverId) throws AvroRemoteException {
+    public CharSequence send(Map<CharSequence, ExecutionInfoBean> info, CharSequence serverId) throws AvroRemoteException {
         if (requestService == null) {
             requestService = (RequestService)context.getBean("requestServiceImpl");
         }
-        requestService.saveOrUpdate(requestsToModel(info, appName.toString(), serverId.toString()));
+        requestService.saveOrUpdate(requestsToModel(info, serverId.toString()));
         return "ok";
     }
 
-    public static List<Request> requestsToModel(Map<CharSequence, ExecutionInfoBean> info, String appName, String serverId) {
+    public static List<Request> requestsToModel(Map<CharSequence, ExecutionInfoBean> info, String serverId) {
         List<Request> model = new ArrayList<Request>();
 
         for (CharSequence  key : info.keySet()) {
@@ -50,10 +50,11 @@ public class StatisticsReceiver implements Statistics {
             request.setDay(DateUtil.dayOfMonth(bean.getSendTime()));
             request.setHour(DateUtil.hourOfDay(bean.getSendTime()));
             request.setMinute(DateUtil.minute(bean.getSendTime()));
-            request.setAppName(appName);
+            request.setAppName(bean.getAppName().toString());
             request.setServerId(serverId);
             request.setUrl(key.toString());
             request.setCount((long) bean.getExecutionCount());
+            request.setFailedCount((long) bean.getFailedCount());
             request.setDuration(bean.getExecutionTimeTotal());
             request.setDetails(requestDetailsToModel(bean.getDetails(), request));
             model.add(request);

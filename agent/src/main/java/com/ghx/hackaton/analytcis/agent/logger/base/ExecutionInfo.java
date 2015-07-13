@@ -11,9 +11,20 @@ public class ExecutionInfo {
 
     private AtomicInteger executionCount = new AtomicInteger(0);
 
+    private AtomicInteger failedCount = new AtomicInteger(0);
+
     private AtomicLong executionTimeTotal = new AtomicLong(0);
 
+    private String contextPath;
+
     private Map<String, ExecutionInfo> details;
+
+    public ExecutionInfo() {
+    }
+
+    public ExecutionInfo(String contextPath) {
+        this.contextPath = contextPath;
+    }
 
     public void increaseExecutionTimes(long duration) {
         executionCount.incrementAndGet();
@@ -24,6 +35,16 @@ public class ExecutionInfo {
         return executionCount.get();
     }
 
+    public void increaseFailedCountTimes(long duration) {
+        failedCount.incrementAndGet();
+        executionCount.incrementAndGet();
+        executionTimeTotal.addAndGet(duration);
+    }
+
+    public Integer getFailedCount() {
+        return failedCount.get();
+    }
+
     public Long getExecutionTimeTotal() {
         return executionTimeTotal.get();
     }
@@ -31,8 +52,17 @@ public class ExecutionInfo {
     public void add(ExecutionInfo info) {
         if (info != null) {
             executionCount.addAndGet(info.getExecutionCount());
+            failedCount.addAndGet(info.getFailedCount());
             executionTimeTotal.addAndGet(info.getExecutionTimeTotal());
         }
+    }
+
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
     }
 
     public void addDetails(Map<String, ExecutionInfo> newDetails) {

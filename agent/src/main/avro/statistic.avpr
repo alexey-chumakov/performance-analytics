@@ -5,7 +5,9 @@
      "types": [
          {"name": "ExecutionInfoBean", "type": "record",
           "fields": [
+              {"name": "appName", "type": "string"},
               {"name": "executionCount", "type": "int"},
+              {"name": "failedCount", "type": "int"},
               {"name": "executionTimeTotal", "type": "long"},
               {"name": "sendTime", "type": "long"},
               {"name": "details", "type" : {"type": "map", "values": "ExecutionInfoBean"}}
@@ -17,7 +19,6 @@
          "send": {
              "request": [
                 {"name": "info", "type": {"type": "map", "values": "ExecutionInfoBean"}},
-                {"name": "appName", "type": "string"},
                 {"name": "serverId", "type": "string"}
              ],
              "response": "string"

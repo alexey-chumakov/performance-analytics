@@ -30,8 +30,6 @@ public class RequestLogger {
 
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1);
 
-    private String appName;
-
     private String serverId;
 
     public RequestLogger() {
@@ -48,12 +46,6 @@ public class RequestLogger {
         evictionTime = time;
     }
 
-    public void setAppName(String appName) {
-        if (this.appName == null) {
-            this.appName = appName;
-        }
-    }
-
     public static synchronized RequestLogger getInstance() {
         if (requestLogger == null) {
             requestLogger = new RequestLogger();
@@ -61,10 +53,22 @@ public class RequestLogger {
         return requestLogger;
     }
 
-    public void logRequestCompleted(String url, Long processingTime) {
+    public void logRequestCompleted(String contextPath, String url, Long processingTime) {
         try {
-            ExecutionInfo info = getExecutionInfo(url);
+            ExecutionInfo info = getExecutionInfo(url, contextPath);
             info.increaseExecutionTimes(processingTime);
+            HashMap<String, ExecutionInfo> requestDetails = threadLocalStats.getAndCleanup();
+            info.addDetails(requestDetails);
+        } catch (Exception e) {
+            // Avoid any interruption in request processing
+            e.printStackTrace();
+        }
+    }
+
+    public void logRequestFailed(String contextPath, String url, Long processingTime) {
+        try {
+            ExecutionInfo info = getExecutionInfo(url, contextPath);
+            info.increaseFailedCountTimes(processingTime);
             HashMap<String, ExecutionInfo> requestDetails = threadLocalStats.getAndCleanup();
             info.addDetails(requestDetails);
         } catch (Exception e) {
@@ -89,13 +93,13 @@ public class RequestLogger {
      * @param url
      * @return
      */
-    private ExecutionInfo getExecutionInfo(String url) {
+    private ExecutionInfo getExecutionInfo(String url, String contextPath) {
         if (url.endsWith(".js")) {
-            return requestStats.getExecutionInfoForKey("JS");
+            return requestStats.getExecutionInfoForKey("JS", "all");
         } else if (url.endsWith(".gif") || url.endsWith(".png") || url.endsWith(".jpg") || url.endsWith(".ico")) {
-            return requestStats.getExecutionInfoForKey("Image");
+            return requestStats.getExecutionInfoForKey("Image", "all");
         }
-        return requestStats.getExecutionInfoForKey(url);
+        return requestStats.getExecutionInfoForKey(url, contextPath);
     }
 
     protected class EventEvictionThread implements Runnable {
@@ -112,7 +116,7 @@ public class RequestLogger {
         }
 
         protected void evictEvents() {
-            sender.send(appName, serverId, requestStats.getAndCleanup());
+            sender.send(serverId, requestStats.getAndCleanup());
         }
     }
 

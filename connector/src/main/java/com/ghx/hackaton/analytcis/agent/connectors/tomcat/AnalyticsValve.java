@@ -20,12 +20,13 @@ public class AnalyticsValve extends ValveBase {
         long start = System.currentTimeMillis();
         try {
             getNext().invoke(request, response);
+            long end = System.currentTimeMillis();
+            RequestLogger.getInstance().logRequestCompleted(request.getContextPath(), request.getRequestURL().toString(), end - start);
         } catch (RuntimeException e) {
+            long end = System.currentTimeMillis();
+            RequestLogger.getInstance().logRequestFailed(request.getContextPath(), request.getRequestURL().toString(), end - start);
             throw e;
         } finally {
-            long end = System.currentTimeMillis();
-            RequestLogger.getInstance().setAppName(request.getContextPath()); // FIXME WTF?
-            RequestLogger.getInstance().logRequestCompleted(request.getRequestURL().toString(), end - start);
         }
     }
 }
