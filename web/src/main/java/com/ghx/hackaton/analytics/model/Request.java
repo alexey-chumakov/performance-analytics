@@ -13,6 +13,7 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY,
                 query = "select " +
+                        "r.timestamp as timestamp, " +
                         "r.year as year, " +
                         "r.month as month, " +
                         "r.day as day, " +
@@ -21,7 +22,8 @@ import java.util.List;
                         "r.serverId as serverId, " +
                         "r.url as url, " +
                         "sum(r.count) as count, " +
-                        "sum(r.duration) as duration " +
+                        "sum(r.duration) as duration, " +
+                        "sum(r.duration) / sum(r.count) as avgDuration " +
                         "from Request r " +
                         "where :fromDate <= r.timestamp and r.timestamp <= :toDate " +
                         "group by r.year, r.month, r.day, r.hour, r.appName, r.serverId, r.url"),
@@ -77,6 +79,9 @@ public class Request extends AbstractEntity {
 
     @Column(name = "DURATION", nullable = false)
     private Long duration;
+
+    @Column(name = "AVG_DURATION", insertable = false, updatable = false)
+    private Long avgDuration;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "request")
     private List<RequestDetails> details;
@@ -167,6 +172,14 @@ public class Request extends AbstractEntity {
 
     public void setDuration(Long duration) {
         this.duration = duration;
+    }
+
+    public Long getAvgDuration() {
+        return avgDuration;
+    }
+
+    public void setAvgDuration(Long avgDuration) {
+        this.avgDuration = avgDuration;
     }
 
     public List<RequestDetails> getDetails() {
