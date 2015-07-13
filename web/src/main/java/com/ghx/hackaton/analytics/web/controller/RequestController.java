@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/request")
 public class RequestController {
 
-    private static final String UI_DATE_FORMAT = "yyyy-MM-dd HH:mm";
+    private static final String UI_DATE_FORMAT = "yyyy-MM-dd";
 
     @Autowired
     private RequestService requestService;
