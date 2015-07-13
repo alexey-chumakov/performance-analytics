@@ -18,9 +18,13 @@ public class AnalyticsValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         long start = System.currentTimeMillis();
-        getNext().invoke(request, response);
-        long end = System.currentTimeMillis();
-        RequestLogger.getInstance().setAppName(request.getContextPath());
-        RequestLogger.getInstance().logRequestCompleted(request.getRequestURL().toString(), end - start);
+        try {
+            getNext().invoke(request, response);
+        } catch (RuntimeException e) {
+            long end = System.currentTimeMillis();
+            RequestLogger.getInstance().setAppName(request.getContextPath()); // FIXME WTF?
+            RequestLogger.getInstance().logRequestCompleted(request.getRequestURL().toString(), end - start);
+            throw e;
+        }
     }
 }
