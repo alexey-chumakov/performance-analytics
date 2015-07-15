@@ -2,11 +2,16 @@ package com.ghx.hackaton.analytics.dao.impl;
 
 import com.ghx.hackaton.analytics.dao.RequestDAO;
 import com.ghx.hackaton.analytics.model.Request;
-import com.ghx.hackaton.analytics.util.DateUtil;
+import com.ghx.hackaton.analytics.model.dto.RequestDuration;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DoubleType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.StringType;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -66,4 +71,37 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
         query.executeUpdate();
     }
 
+    @Override
+    public List<RequestDuration> getAggregatedByDate(Date from, Date to) {
+        SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY);
+        sqlQuery.setLong("fromDate", from.getTime());
+        sqlQuery.setLong("toDate", to.getTime());
+
+        sqlQuery.addScalar("year", IntegerType.INSTANCE)
+                .addScalar("month", IntegerType.INSTANCE)
+                .addScalar("day", IntegerType.INSTANCE)
+                .addScalar("systemName", StringType.INSTANCE)
+                .addScalar("count", LongType.INSTANCE)
+                .addScalar("duration", LongType.INSTANCE)
+                .addScalar("avgDuration", DoubleType.INSTANCE);
+
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(RequestDuration.class));
+
+        return sqlQuery.list();
+    }
+
+    @Override
+    public RequestDuration getTotal(Date from, Date to) {
+        SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(Request.SELECT_TOTAL_DURATION_QUERY);
+        sqlQuery.setLong("fromDate", from.getTime());
+        sqlQuery.setLong("toDate", to.getTime());
+
+        sqlQuery.addScalar("count", LongType.INSTANCE)
+                .addScalar("duration", LongType.INSTANCE)
+                .addScalar("avgDuration", DoubleType.INSTANCE);
+
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(RequestDuration.class));
+
+        return (RequestDuration) sqlQuery.uniqueResult();
+    }
 }

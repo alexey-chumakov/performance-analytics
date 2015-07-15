@@ -4,6 +4,7 @@ import com.ghx.hackaton.analytics.dao.RequestDAO;
 import com.ghx.hackaton.analytics.dao.RequestDetailsDAO;
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
+import com.ghx.hackaton.analytics.model.dto.RequestDuration;
 import com.ghx.hackaton.analytics.service.RequestService;
 import com.ghx.hackaton.analytics.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,5 +69,15 @@ public class RequestServiceImpl implements RequestService {
     public void delete(Date from, Date to) {
         requestDetailsDAO.delete(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to));
         requestDAO.delete(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to));
+    }
+
+    @Override
+    public List<RequestDuration> getAggregatedByDate(Date from, Date to) {
+        return requestDAO.getAggregatedByDate(from, to);
+    }
+
+    @Override
+    public RequestDuration getTotal(Date from, Date to) {
+        return requestDAO.getTotal(from, to);
     }
 }

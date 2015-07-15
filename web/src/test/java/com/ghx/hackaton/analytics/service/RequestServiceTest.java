@@ -95,6 +95,7 @@ public class RequestServiceTest  {
         request.setServerId(serverId);
         request.setUrl(url);
         request.setCount(count);
+        request.setFailedCount(0L);
         request.setDuration(duration);
         request.setDetails(new ArrayList<RequestDetails>());
         return request;

@@ -68,4 +68,13 @@ public class DateUtil {
     public static Date truncateToHour(Date date) {
         return DateUtils.truncate(date, Calendar.HOUR);
     }
+
+    public static long timestamp(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance(UTC);
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+
+        return DateUtils.truncate(calendar, Calendar.DATE).getTimeInMillis();
+    }
 }

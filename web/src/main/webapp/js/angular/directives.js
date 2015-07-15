@@ -67,4 +67,64 @@ angular
             }
         }
     })
+
+    .directive('pieChart', function() {
+
+        return {
+            restrict: 'E',
+            template: '<div></div>',
+            scope: {
+                data: "=",
+                formatter: "="
+            },
+            replace: true,
+            link: function (scope, element, attrs) {
+
+                var chart = Morris.Donut({
+                    element: element,
+                    data: scope.data,
+                    formatter: scope.formatter
+                });
+
+                scope.$watch('data', function() {
+                    chart.setData(scope.data);
+                }, true);
+            }
+        };
+    })
+
+    .directive('lineChart', function() {
+
+        return {
+            restrict: 'E',
+            template: '<div></div>',
+            scope: {
+                data: "=",
+                xkey: "=",
+                ykeys: "=",
+                labels: "=",
+                postUnits: "@",
+                xLabels: "@"
+            },
+            replace: true,
+            link: function (scope, element, attrs) {
+
+                var chart = Morris.Line({
+                    element: element,
+                    data: scope.data,
+                    xkey: scope.xkey,
+                    ykeys: scope.ykeys,
+                    labels: scope.labels,
+                    postUnits: scope.postUnits,
+                    xLabels: 'day'
+                });
+
+                scope.$watch('data', function() {
+                    chart.options.ykeys = scope.ykeys;
+                    chart.options.labels = scope.labels;
+                    chart.setData(scope.data);
+                }, true);
+            }
+        };
+    })
 ;

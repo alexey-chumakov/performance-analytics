@@ -20,6 +20,10 @@
     <script src="js/angular/request/controllers.js"></script>
     <script src="js/angular/request/services.js"></script>
 
+    <script src="js/angular/duration/duration.js"></script>
+    <script src="js/angular/duration/controllers.js"></script>
+    <script src="js/angular/duration/services.js"></script>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,11 +32,16 @@
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <%--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css">--%>
+
+    <!-- Bootstrap DateRangePicker CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/1/daterangepicker-bs3.css" />
 
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="css/plugins/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -60,14 +69,17 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="">Performance analytics</a>
+            <a class="navbar-brand" href="#/">Performance analytics</a>
         </div>
 
         <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav side-nav">
                 <li class="active">
-                    <a href="#/request"><i class="fa fa-fw fa-dashboard"></i> Average request time</a>
+                    <a href="#/request"><i class="fa fa-fw fa-dashboard"></i> Requests info</a>
+                </li>
+                <li class="active">
+                    <a href="#/duration"><i class="fa fa-fw fa-bar-chart-o"></i> Average request duration report</a>
                 </li>
             </ul>
         </div>
@@ -100,11 +112,12 @@
 <!-- Bootstrap Core JavaScript -->
 <script src="js/lib/bootstrap.min.js"></script>
 
-<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>--%>
-<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.14.30/js/bootstrap-datetimepicker.min.js"></script>--%>
+<!-- Morris Charts JavaScript -->
+<script src="js/lib/plugins/morris/raphael.min.js"></script>
+<script src="js/lib/plugins/morris/morris.js"></script>
+<script src="js/lib/plugins/morris/morris-data.js"></script>
 
-
+<!-- DateRangePicker JavaScript -->
 <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/1/daterangepicker.js"></script>
-<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/1/daterangepicker-bs3.css" />
 </body>
 </html>

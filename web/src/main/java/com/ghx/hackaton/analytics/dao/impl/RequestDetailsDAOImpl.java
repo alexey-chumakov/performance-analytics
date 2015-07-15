@@ -3,9 +3,13 @@ package com.ghx.hackaton.analytics.dao.impl;
 import com.ghx.hackaton.analytics.dao.RequestDetailsDAO;
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
-import com.ghx.hackaton.analytics.util.DateUtil;
+import com.ghx.hackaton.analytics.model.dto.RequestDuration;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DoubleType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.StringType;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -28,12 +32,8 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
     @Override
     public List<RequestDetails> find(Date from, Date to, Request request) {
         Query query = getSession().getNamedQuery(RequestDetails.SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY);
-        query.setInteger("fromYear", DateUtil.year(from));
-        query.setInteger("toYear", DateUtil.year(to));
-        query.setInteger("fromMonth", DateUtil.month(from));
-        query.setInteger("toMonth", DateUtil.month(to));
-        query.setInteger("fromDay", DateUtil.dayOfMonth(from));
-        query.setInteger("toDay", DateUtil.dayOfMonth(to));
+        query.setLong("fromDate", from.getTime());
+        query.setLong("toDate", to.getTime());
         query.setString("appName", request.getAppName());
         query.setString("serverId", request.getServerId());
         query.setString("url", request.getUrl());
@@ -50,5 +50,21 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
         query.setLong("toDate", to.getTime());
 
         query.executeUpdate();
+    }
+
+    @Override
+    public List<RequestDuration> getTotalBySystemNames(Date from, Date to) {
+        SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(RequestDetails.SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY);
+        sqlQuery.setLong("fromDate", from.getTime());
+        sqlQuery.setLong("toDate", to.getTime());
+
+        sqlQuery.addScalar("systemName", StringType.INSTANCE)
+                .addScalar("count", LongType.INSTANCE)
+                .addScalar("duration", LongType.INSTANCE)
+                .addScalar("avgDuration", DoubleType.INSTANCE);
+
+        sqlQuery.setResultTransformer(Transformers.aliasToBean(RequestDuration.class));
+
+        return sqlQuery.list();
     }
 }

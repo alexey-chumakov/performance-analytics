@@ -4,12 +4,42 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
+@NamedNativeQueries({
+        @NamedNativeQuery(name = Request.SELECT_TOTAL_DURATION_QUERY,
+                query = "SELECT " +
+                        "COALESCE (SUM(r.COUNT), 0) as count, " +
+                        "COALESCE (SUM(r.DURATION), 0) as duration, " +
+                        "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
+                        "FROM REQUEST r " +
+                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate"
+        ),
+        @NamedNativeQuery(name = Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY,
+                query = "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, 'Total' as systemName, " +
+                        "COALESCE (SUM(r.COUNT), 0) as count, " +
+                        "COALESCE (SUM(r.DURATION), 0) as duration, " +
+                        "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
+                        "FROM REQUEST r " +
+                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
+                        "GROUP BY r.YEAR, r.MONTH, r.DAY) " +
+                        "union " +
+                        "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, rd.SYSTEM_NAME as systemName, " +
+                        "COALESCE (SUM(rd.COUNT), 0) as count, " +
+                        "COALESCE (SUM(rd.DURATION), 0) as duration, " +
+                        "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
+                        "FROM REQUEST_DETAILS rd JOIN REQUEST r ON r.id = rd.REQUEST_ID " +
+                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
+                        "GROUP BY r.YEAR, r.MONTH, r.DAY, rd.SYSTEM_NAME) " +
+                        "ORDER BY year, month, day"
+        )
+})
 @NamedQueries({
         @NamedQuery(name = Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY,
                 query = "select " +
@@ -42,6 +72,9 @@ import java.util.List;
 @Entity
 @Table(name = "REQUEST")
 public class Request extends AbstractEntity {
+
+    public static final String SELECT_TOTAL_DURATION_QUERY = "Request.SELECT_TOTAL_DURATION_QUERY";
+    public static final String SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY = "Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY";
 
     public static final String SELECT_AGGREGATED_BY_DATE_RANGE_QUERY = "Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY";
     public static final String UPDATE_QUERY = "Request.UPDATE_QUERY";
@@ -84,7 +117,7 @@ public class Request extends AbstractEntity {
     private Long duration;
 
     @Column(name = "AVG_DURATION", insertable = false, updatable = false)
-    private Long avgDuration;
+    private Double avgDuration;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "request")
     private List<RequestDetails> details;
@@ -185,11 +218,11 @@ public class Request extends AbstractEntity {
         this.duration = duration;
     }
 
-    public Long getAvgDuration() {
+    public Double getAvgDuration() {
         return avgDuration;
     }
 
-    public void setAvgDuration(Long avgDuration) {
+    public void setAvgDuration(Double avgDuration) {
         this.avgDuration = avgDuration;
     }
 

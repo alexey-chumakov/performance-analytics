@@ -3,8 +3,10 @@ package com.ghx.hackaton.analytics.web.controller;
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
 import com.ghx.hackaton.analytics.service.RequestDetailsService;
+import com.ghx.hackaton.analytics.service.RequestReportService;
 import com.ghx.hackaton.analytics.service.RequestService;
 import com.ghx.hackaton.analytics.web.bean.RequestBean;
+import com.ghx.hackaton.analytics.web.bean.RequestDurationReportBean;
 import com.ghx.hackaton.analytics.web.converter.ModelClientConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +30,8 @@ public class RequestController {
     private RequestService requestService;
     @Autowired
     private RequestDetailsService requestDetailsService;
+    @Autowired
+    private RequestReportService requestReportService;
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public void save(List<RequestBean> requests) {
@@ -51,5 +55,14 @@ public class RequestController {
                                      @RequestParam Calendar endDate,
                                      @ModelAttribute Request request) {
         return requestDetailsService.findByRequest(startDate.getTime(), endDate.getTime(), request);
+    }
+
+    @RequestMapping(value = "/durationReport")
+    @ResponseBody
+    public RequestDurationReportBean getDurationReport(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                                  @RequestParam Calendar startDate,
+                                                  @DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                                  @RequestParam Calendar endDate) {
+        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime()));
     }
 }
