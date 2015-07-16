@@ -40,7 +40,7 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
 
     @Override
     public List<Request> find(Date from, Date to) {
-        Query query = getSession().getNamedQuery(Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY);
+        Query query = getSession().getNamedQuery(Request.SELECT_BY_DATE_RANGE_QUERY);
         query.setLong("fromDate", from.getTime());
         query.setLong("toDate", to.getTime());
         query.setResultTransformer(Transformers.aliasToBean(getClazz()));

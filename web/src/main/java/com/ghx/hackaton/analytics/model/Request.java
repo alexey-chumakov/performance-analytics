@@ -43,7 +43,7 @@ import java.util.List;
         )
 })
 @NamedQueries({
-        @NamedQuery(name = Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY,
+        @NamedQuery(name = Request.SELECT_BY_DATE_RANGE_QUERY,
                 query = "select " +
                         "r.timestamp as timestamp, " +
                         "r.year as year, " +
@@ -53,13 +53,13 @@ import java.util.List;
                         "r.appName as appName, " +
                         "r.serverId as serverId, " +
                         "r.url as url, " +
-                        "sum(r.count) as count, " +
-                        "sum(r.failedCount) as failedCount, " +
-                        "sum(r.duration) as duration, " +
-                        "(sum(r.duration) * 1.0) / sum(r.count) as avgDuration " +
+                        "r.count as count, " +
+                        "r.failedCount as failedCount, " +
+                        "r.duration as duration, " +
+                        "(r.duration * 1.0) / r.count as avgDuration " +
                         "from Request r " +
                         "where :fromDate <= r.timestamp and r.timestamp <= :toDate " +
-                        "group by r.year, r.month, r.day, r.hour, r.appName, r.serverId, r.url"),
+                        "order by r.timestamp"),
 
         @NamedQuery(name = Request.UPDATE_QUERY,
                 query = "update Request r set r.count = r.count + :newCount, r.failedCount = r.failedCount + :newFailedCount, " +
@@ -80,7 +80,7 @@ public class Request extends AbstractEntity {
     public static final String SELECT_TOTAL_DURATION_QUERY = "Request.SELECT_TOTAL_DURATION_QUERY";
     public static final String SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY = "Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY";
 
-    public static final String SELECT_AGGREGATED_BY_DATE_RANGE_QUERY = "Request.SELECT_AGGREGATED_BY_DATE_RANGE_QUERY";
+    public static final String SELECT_BY_DATE_RANGE_QUERY = "Request.SELECT_BY_DATE_RANGE_QUERY";
     public static final String UPDATE_QUERY = "Request.UPDATE_QUERY";
     public static final String DELETE_BY_DATE_RANGE_QUERY = "Request.DELETE_BY_DATE_RANGE_QUERY";
 

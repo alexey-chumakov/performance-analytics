@@ -22,7 +22,7 @@
                     <th>Url</th>
                     <th>Count</th>
                     <th>Failed count</th>
-                    <th>Avg time</th>
+                    <th>Total duration</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -33,7 +33,7 @@
                     <td>{{request.url}}</td>
                     <td>{{request.count}}</td>
                     <td>{{request.failedCount}}</td>
-                    <td>{{request.avgDuration | number : 2}} ms</td>
+                    <td>{{request.duration}} ms</td>
                 </tr>
                 </tbody>
             </table>
