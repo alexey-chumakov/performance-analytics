@@ -24,6 +24,7 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     public int updateRequest(Request request) {
         Query query = getSession().getNamedQuery(Request.UPDATE_QUERY);
         query.setLong("newCount", request.getCount());
+        query.setLong("newFailedCount", request.getFailedCount());
         query.setLong("newDuration", request.getDuration());
         query.setInteger("year", request.getYear());
         query.setInteger("month", request.getMonth());
@@ -53,6 +54,7 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
         example.excludeProperty("id");
         example.excludeProperty("timestamp");
         example.excludeProperty("count");
+        example.excludeProperty("failedCount");
         example.excludeProperty("duration");
 
         return (Long) getSession()

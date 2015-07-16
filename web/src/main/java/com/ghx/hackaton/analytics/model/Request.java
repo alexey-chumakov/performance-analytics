@@ -59,7 +59,8 @@ import java.util.List;
                         "group by r.year, r.month, r.day, r.hour, r.appName, r.serverId, r.url"),
 
         @NamedQuery(name = Request.UPDATE_QUERY,
-                query = "update Request r set r.count = r.count + :newCount, r.duration = r.duration + :newDuration " +
+                query = "update Request r set r.count = r.count + :newCount, r.failedCount = r.failedCount + :newFailedCount, " +
+                        "r.duration = r.duration + :newDuration " +
                         "where r.year = :year and r.month = :month " +
                         "and r.day = :day and r.hour = :hour " +
                         "and r.minute = :minute and r.appName = :appName " +
