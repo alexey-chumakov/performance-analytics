@@ -53,6 +53,7 @@ public class ModelClientConverter {
 
     public static RequestDurationReportBean toBean(RequestDurationReport report) {
         RequestDurationReportBean bean = new RequestDurationReportBean();
+        bean.setAppName(report.getAppName());
         bean.setTotalDuration(report.getTotalDuration());
         bean.setTotalRequestDurations(report.getTotalRequestDurations());
 
@@ -66,5 +67,13 @@ public class ModelClientConverter {
 
         bean.setDailyDurations(dailyDurations);
         return bean;
+    }
+
+    public static List<RequestDurationReportBean> toBean(List<RequestDurationReport> reports) {
+        List<RequestDurationReportBean> beans = new ArrayList<RequestDurationReportBean>();
+        for (RequestDurationReport report : reports) {
+            beans.add(toBean(report));
+        }
+        return beans;
     }
 }

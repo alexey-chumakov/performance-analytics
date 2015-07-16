@@ -77,7 +77,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public RequestDuration getTotal(Date from, Date to) {
-        return requestDAO.getTotal(from, to);
+    public List<RequestDuration> getTotalByApp(Date from, Date to) {
+        return requestDAO.getTotalByApp(from, to);
     }
 }

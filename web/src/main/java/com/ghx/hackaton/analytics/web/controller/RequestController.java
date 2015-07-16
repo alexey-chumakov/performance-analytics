@@ -59,7 +59,7 @@ public class RequestController {
 
     @RequestMapping(value = "/durationReport")
     @ResponseBody
-    public RequestDurationReportBean getDurationReport(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+    public List<RequestDurationReportBean> getDurationReport(@DateTimeFormat(pattern = UI_DATE_FORMAT)
                                                   @RequestParam Calendar startDate,
                                                   @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                                   @RequestParam Calendar endDate) {

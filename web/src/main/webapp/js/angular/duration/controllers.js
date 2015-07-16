@@ -2,47 +2,58 @@
 
 angular.module('request-duration.controllers', [])
 
-    .controller('RequestDurationController', ['$scope', '$location', 'RequestDurationService',
-        function ($scope, $location, RequestDurationService) {
+    .controller('RequestDurationController', ['$scope', '$location', '$filter', 'RequestDurationService',
+        function ($scope, $location, $filter, RequestDurationService) {
             $scope.filter = {
                 startDate: moment().format("YYYY-MM-DD"),
                 endDate: moment().format("YYYY-MM-DD")
             };
-
             $scope.durationFormatter = function(y, data) {
-                return y + ' ms';
+                return $filter('number')(y, 2) + ' ms';
             };
-
-            $scope.totalDurationReport = [{value:"",label:""}];
-            $scope.dailyDurationReport = [];
-
             $scope.xkey = 'timestamp';
-            $scope.ykeys = [];
+
+            $scope.reports = [];
 
             $scope.refresh = function() {
                 $location.search($scope.filter).replace();
                 RequestDurationService.getDurationReport($scope.filter).then(function (response) {
-                    $scope.totalDurationReport = response.totalRequestDurations.map(function(totalRequestDuration) {
-                        return {
-                            label: totalRequestDuration.systemName,
-                            value: totalRequestDuration.avgDuration
-                        };
-                    });
-                    $scope.dailyDurationReport = response.dailyDurations;
-                    var ykeys = new Set();
-                    response.dailyDurations.forEach(function(dailyDuration) {
-                        for (var system in dailyDuration) {
-                            if (dailyDuration.hasOwnProperty(system)) {
-                                ykeys.add(system);
-                            }
+
+                    var newReports = [];
+                    for (var i = 0; i < response.length; i++) {
+                        var report = response[i];
+                        var totalDurationReport = report.totalRequestDurations.map(function(totalRequestDuration) {
+                            return {
+                                label: totalRequestDuration.systemName,
+                                value: totalRequestDuration.avgDuration
+                            };
+                        });
+                        if (totalDurationReport.length == 0) {
+                            totalDurationReport = [{value:"",label:""}];
                         }
-                    });
-                    ykeys.delete($scope.xkey);
-                    var ykeysArr = [];
-                    ykeys.forEach(function(key){
-                        ykeysArr.push(key);
-                    });
-                    $scope.ykeys = ykeysArr;
+                        var dailyDurationReport = report.dailyDurations;
+                        var ykeys = new Set();
+                        report.dailyDurations.forEach(function(dailyDuration) {
+                            for (var system in dailyDuration) {
+                                if (dailyDuration.hasOwnProperty(system)) {
+                                    ykeys.add(system);
+                                }
+                            }
+                        });
+                        ykeys.delete($scope.xkey);
+                        var ykeysArr = [];
+                        ykeys.forEach(function(key){
+                            ykeysArr.push(key);
+                        });
+                        newReports.push({
+                            appName: report.appName,
+                            totalDurationReport: totalDurationReport,
+                            dailyDurationReport: dailyDurationReport,
+                            ykeys: ykeysArr
+                        });
+                    }
+
+                    $scope.reports = newReports;
                 });
             };
         }]);

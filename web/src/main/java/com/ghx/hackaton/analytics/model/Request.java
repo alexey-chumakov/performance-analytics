@@ -15,28 +15,30 @@ import java.util.List;
 @NamedNativeQueries({
         @NamedNativeQuery(name = Request.SELECT_TOTAL_DURATION_QUERY,
                 query = "SELECT " +
-                        "COALESCE (SUM(r.COUNT), 0) as count, " +
-                        "COALESCE (SUM(r.DURATION), 0) as duration, " +
-                        "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
-                        "FROM REQUEST r " +
-                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate"
-        ),
-        @NamedNativeQuery(name = Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY,
-                query = "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, 'Total' as systemName, " +
+                        "r.APP_NAME as appName, " +
                         "COALESCE (SUM(r.COUNT), 0) as count, " +
                         "COALESCE (SUM(r.DURATION), 0) as duration, " +
                         "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
                         "FROM REQUEST r " +
                         "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY r.YEAR, r.MONTH, r.DAY) " +
+                        "GROUP BY r.APP_NAME"
+        ),
+        @NamedNativeQuery(name = Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY,
+                query = "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, r.APP_NAME as appName, 'Total' as systemName, " +
+                        "COALESCE (SUM(r.COUNT), 0) as count, " +
+                        "COALESCE (SUM(r.DURATION), 0) as duration, " +
+                        "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
+                        "FROM REQUEST r " +
+                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
+                        "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME) " +
                         "union " +
-                        "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, rd.SYSTEM_NAME as systemName, " +
+                        "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, r.APP_NAME as appName, rd.SYSTEM_NAME as systemName, " +
                         "COALESCE (SUM(rd.COUNT), 0) as count, " +
                         "COALESCE (SUM(rd.DURATION), 0) as duration, " +
                         "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
                         "FROM REQUEST_DETAILS rd JOIN REQUEST r ON r.id = rd.REQUEST_ID " +
                         "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY r.YEAR, r.MONTH, r.DAY, rd.SYSTEM_NAME) " +
+                        "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME, rd.SYSTEM_NAME) " +
                         "ORDER BY year, month, day"
         )
 })

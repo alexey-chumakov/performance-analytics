@@ -1,28 +1,46 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            <small>Average request duration</small>
+        </h1>
+    </div>
+</div>
+
 <div control-panel filter="filter" refresh="refresh()"></div>
 
-<div class="row">
-    <div class="col-lg-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-long-arrow-right"></i> Donut Chart Example</h3>
-            </div>
-            <div class="panel-body" ng-show="totalDurationReport">
-                <pie-chart data="totalDurationReport" formatter="durationFormatter"></pie-chart>
-                <div class="text-right">
-                    <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+<div ng-repeat="report in reports">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header">
+                {{ report.appName }}
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-long-arrow-right"></i> pie chart </h3>
+                </div>
+                <div class="panel-body">
+                    <pie-chart data="report.totalDurationReport" formatter="durationFormatter"></pie-chart>
+                    <div class="text-right">
+                        <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="panel panel-green">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-long-arrow-right"></i> Area Graph Example with Tooltips</h3>
-            </div>
-            <div class="panel-body">
-                <line-chart data="dailyDurationReport" xkey="xkey" ykeys="ykeys" labels="ykeys" post-units="ms" x-labels="day"></line-chart>
-                <div class="text-right">
-                    <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-long-arrow-right"></i> line chart </h3>
+                </div>
+                <div class="panel-body">
+                    <line-chart data="report.dailyDurationReport" xkey="xkey" ykeys="report.ykeys" labels="report.ykeys"
+                                post-units="ms" x-labels="day"></line-chart>
+                    <div class="text-right">
+                        <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>

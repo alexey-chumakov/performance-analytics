@@ -8,9 +8,18 @@ import java.util.Map;
 
 public class RequestDurationReport {
 
+    private String appName;
     private Double totalDuration;
     private List<RequestDuration> totalRequestDurations;
     private Map<Long, Map<String, Double>> dailyDurations;
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
 
     public Double getTotalDuration() {
         return totalDuration;

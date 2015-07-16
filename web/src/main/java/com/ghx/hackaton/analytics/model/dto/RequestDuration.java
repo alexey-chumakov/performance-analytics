@@ -6,6 +6,7 @@ public class RequestDuration {
     private Integer year;
     private Integer month;
     private Integer day;
+    private String appName;
     private String systemName;
     private Long duration;
     private Long count;
@@ -33,6 +34,14 @@ public class RequestDuration {
 
     public void setDay(Integer day) {
         this.day = day;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public String getSystemName() {

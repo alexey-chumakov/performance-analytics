@@ -116,7 +116,10 @@ angular
                     ykeys: scope.ykeys,
                     labels: scope.labels,
                     postUnits: scope.postUnits,
-                    xLabels: 'day'
+                    xLabels: 'day',
+                    dateFormat: function(millis) {
+                        return moment(millis).format("YYYY-MM-DD")
+                    }
                 });
 
                 scope.$watch('data', function() {

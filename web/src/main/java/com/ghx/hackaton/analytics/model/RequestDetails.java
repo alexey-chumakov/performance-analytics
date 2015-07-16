@@ -14,13 +14,14 @@ import javax.persistence.Table;
 @NamedNativeQueries({
         @NamedNativeQuery(name = RequestDetails.SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY,
                 query = "SELECT " +
+                        "r.APP_NAME as appName, " +
                         "rd.SYSTEM_NAME as systemName, " +
                         "COALESCE (SUM(rd.COUNT), 0) as count, " +
                         "COALESCE (SUM(rd.DURATION), 0) as duration, " +
                         "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
                         "FROM REQUEST_DETAILS rd JOIN REQUEST r on rd.REQUEST_ID = r.id " +
                         "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY SYSTEM_NAME"
+                        "GROUP BY r.APP_NAME, rd.SYSTEM_NAME"
         )
 })
 @NamedQueries({
@@ -33,7 +34,7 @@ import javax.persistence.Table;
                         "r as request " +
                         "from RequestDetails rd join rd.request r " +
                         "where :fromDate <= r.timestamp and r.timestamp <= :toDate " +
-                        "group by r.year, r.month, r.day, rd.systemName " +
+                        "group by r.year, r.month, r.day, r.appName, rd.systemName " +
                         "order by r.timestamp"),
 
         @NamedQuery(name = RequestDetails.SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY,

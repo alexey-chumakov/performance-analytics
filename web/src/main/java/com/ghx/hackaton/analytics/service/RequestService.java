@@ -16,6 +16,6 @@ public interface RequestService {
 
     List<RequestDuration> getAggregatedByDate(Date from, Date to);
 
-    RequestDuration getTotal(Date from, Date to);
+    List<RequestDuration> getTotalByApp(Date from, Date to);
 
 }

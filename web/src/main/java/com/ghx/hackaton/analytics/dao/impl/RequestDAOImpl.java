@@ -82,6 +82,7 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
         sqlQuery.addScalar("year", IntegerType.INSTANCE)
                 .addScalar("month", IntegerType.INSTANCE)
                 .addScalar("day", IntegerType.INSTANCE)
+                .addScalar("appName", StringType.INSTANCE)
                 .addScalar("systemName", StringType.INSTANCE)
                 .addScalar("count", LongType.INSTANCE)
                 .addScalar("duration", LongType.INSTANCE)
@@ -93,17 +94,18 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     }
 
     @Override
-    public RequestDuration getTotal(Date from, Date to) {
+    public List<RequestDuration> getTotalByApp(Date from, Date to) {
         SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(Request.SELECT_TOTAL_DURATION_QUERY);
         sqlQuery.setLong("fromDate", from.getTime());
         sqlQuery.setLong("toDate", to.getTime());
 
-        sqlQuery.addScalar("count", LongType.INSTANCE)
+        sqlQuery.addScalar("appName", StringType.INSTANCE)
+                .addScalar("count", LongType.INSTANCE)
                 .addScalar("duration", LongType.INSTANCE)
                 .addScalar("avgDuration", DoubleType.INSTANCE);
 
         sqlQuery.setResultTransformer(Transformers.aliasToBean(RequestDuration.class));
 
-        return (RequestDuration) sqlQuery.uniqueResult();
+        return sqlQuery.list();
     }
 }

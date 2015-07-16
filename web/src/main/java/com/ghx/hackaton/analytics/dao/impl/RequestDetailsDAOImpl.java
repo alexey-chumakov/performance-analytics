@@ -58,7 +58,8 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
         sqlQuery.setLong("fromDate", from.getTime());
         sqlQuery.setLong("toDate", to.getTime());
 
-        sqlQuery.addScalar("systemName", StringType.INSTANCE)
+        sqlQuery.addScalar("appName", StringType.INSTANCE)
+                .addScalar("systemName", StringType.INSTANCE)
                 .addScalar("count", LongType.INSTANCE)
                 .addScalar("duration", LongType.INSTANCE)
                 .addScalar("avgDuration", DoubleType.INSTANCE);

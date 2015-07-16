@@ -9,10 +9,14 @@ import com.ghx.hackaton.analytics.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Service
 public class RequestReportServiceImpl implements RequestReportService {
@@ -25,12 +29,89 @@ public class RequestReportServiceImpl implements RequestReportService {
     private RequestDetailsService requestDetailsService;
 
     @Override
-    public RequestDurationReport getDurationReport(Date from, Date to) {
-        RequestDuration totalRequestDuration = requestService.getTotal(from, to);
-        List<RequestDuration> dailyRequestDurations = requestService.getAggregatedByDate(from, to);
-        List<RequestDuration> totalBySystemName = requestDetailsService.getTotalBySystemNames(from, to);
-        addOtherDuration(totalRequestDuration.getAvgDuration(), totalSystemDuration(totalBySystemName), totalBySystemName);
+    public List<RequestDurationReport> getDurationReport(Date from, Date to) {
 
+        // appName -> total duration
+        Map<String, RequestDuration> appsTotalRequestDurations = groupByAppName(requestService.getTotalByApp(from, to));
+
+        // appName -> total duration by days and system names
+        Map<String, List<RequestDuration>> appsDailyRequestDurations = groupListByAppName(requestService.getAggregatedByDate(from, to));
+
+        // appName -> total duration by system names
+        Map<String, List<RequestDuration>> appsTotalBySystemName = groupListByAppName(requestDetailsService.getTotalBySystemNames(from, to));
+
+        Set<String> apps = new TreeSet<String>();
+        apps.addAll(appsTotalRequestDurations.keySet());
+        apps.addAll(appsDailyRequestDurations.keySet());
+        apps.addAll(appsTotalBySystemName.keySet());
+
+        List<RequestDurationReport> reports = new ArrayList<RequestDurationReport>();
+        for (String app : apps) {
+            RequestDuration totalRequestDuration = appsTotalRequestDurations.get(app);
+            List<RequestDuration> dailyRequestDurations = appsDailyRequestDurations.get(app);
+            dailyRequestDurations = dailyRequestDurations != null ? dailyRequestDurations : new ArrayList<RequestDuration>();
+            List<RequestDuration> totalBySystemName = appsTotalBySystemName.get(app);
+            totalBySystemName = totalBySystemName != null ? totalBySystemName : new ArrayList<RequestDuration>();
+
+            RequestDurationReport report = new RequestDurationReport();
+            report.setAppName(app);
+            addTotalDurationInfo(totalRequestDuration, report);
+            addTotalDurationsBySystemNameInfo(totalBySystemName, totalRequestDuration, report);
+            addDailyDurationsInfo(dailyRequestDurations, report);
+
+            reports.add(report);
+        }
+
+        return reports;
+    }
+
+    private Map<String, RequestDuration> groupByAppName(List<RequestDuration> requestDurations) {
+        Map<String, RequestDuration> grouped = new HashMap<String, RequestDuration>();
+        for (RequestDuration requestDuration : requestDurations) {
+            grouped.put(requestDuration.getAppName(), requestDuration);
+        }
+        return grouped;
+    }
+
+    private Map<String, List<RequestDuration>> groupListByAppName(List<RequestDuration> requestDurations) {
+        Map<String, List<RequestDuration>> grouped = new HashMap<String, List<RequestDuration>>();
+        for (RequestDuration requestDuration : requestDurations) {
+            String appName = requestDuration.getAppName();
+            if (!grouped.containsKey(appName)) {
+                grouped.put(appName, new ArrayList<RequestDuration>());
+            }
+            grouped.get(appName).add(requestDuration);
+        }
+        return grouped;
+    }
+
+    private void addTotalDurationInfo(RequestDuration totalDuration, RequestDurationReport report) {
+        report.setTotalDuration(totalDuration.getAvgDuration());
+    }
+
+    private void addTotalDurationsBySystemNameInfo(List<RequestDuration> totalBySystemName, RequestDuration totalDuration, RequestDurationReport report) {
+        addOtherDuration(totalDuration.getAvgDuration(), totalSystemDuration(totalBySystemName), totalBySystemName);
+        report.setTotalRequestDurations(totalBySystemName);
+    }
+
+    private double totalSystemDuration(List<RequestDuration> totalBySystemName) {
+        long totalDuration = 0;
+        long totalCount = 0;
+        for (RequestDuration requestDuration : totalBySystemName) {
+            totalDuration += requestDuration.getDuration();
+            totalCount += requestDuration.getCount();
+        }
+        return totalCount != 0 ? (double) totalDuration / totalCount : 0;
+    }
+
+    private void addOtherDuration(double totalDuration, double totalSystemDuration, List<RequestDuration> totalBySystemName) {
+        RequestDuration requestDuration = new RequestDuration();
+        requestDuration.setAvgDuration(totalDuration - totalSystemDuration);
+        requestDuration.setSystemName(JAVA_KEY);
+        totalBySystemName.add(requestDuration);
+    }
+
+    private void addDailyDurationsInfo(List<RequestDuration> dailyRequestDurations, RequestDurationReport report) {
         // timestamp -> (systemName -> duration)
         Map<Long, Map<String, Double>> durations = new LinkedHashMap<Long, Map<String, Double>>();
 
@@ -41,27 +122,6 @@ public class RequestReportServiceImpl implements RequestReportService {
             }
             durations.get(timestamp).put(rd.getSystemName(), rd.getAvgDuration());
         }
-
-        RequestDurationReport report = new RequestDurationReport();
-        report.setTotalDuration(totalRequestDuration.getAvgDuration());
-        report.setTotalRequestDurations(totalBySystemName);
         report.setDailyDurations(durations);
-
-        return report;
-    }
-
-    private long totalSystemDuration(List<RequestDuration> totalBySystemName) {
-        long total = 0;
-        for (RequestDuration requestDuration : totalBySystemName) {
-            total += requestDuration.getAvgDuration();
-        }
-        return total;
-    }
-
-    private void addOtherDuration(double totalDuration, double totalSystemDuration, List<RequestDuration> totalBySystemName) {
-        RequestDuration requestDuration = new RequestDuration();
-        requestDuration.setAvgDuration(totalDuration - totalSystemDuration);
-        requestDuration.setSystemName(JAVA_KEY);
-        totalBySystemName.add(requestDuration);
     }
 }
