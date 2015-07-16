@@ -85,9 +85,11 @@ public class RequestLogger {
      */
     private ExecutionInfo getExecutionInfo(String url, String contextPath) {
         if (url.endsWith(".js")) {
-            return requestStats.getExecutionInfoForKey("JS", "all");
+            return requestStats.getExecutionInfoForKey(contextPath + ":JS", contextPath);
         } else if (url.endsWith(".gif") || url.endsWith(".png") || url.endsWith(".jpg") || url.endsWith(".ico")) {
-            return requestStats.getExecutionInfoForKey("Image", "all");
+            return requestStats.getExecutionInfoForKey(contextPath + ":Image", contextPath);
+        } else if (url.endsWith(".css")) {
+            return requestStats.getExecutionInfoForKey(contextPath + ":CSS", contextPath);
         }
         return requestStats.getExecutionInfoForKey(url, contextPath);
     }
