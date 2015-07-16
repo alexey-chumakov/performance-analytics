@@ -21,6 +21,7 @@
                     <th>Server</th>
                     <th>Url</th>
                     <th>Count</th>
+                    <th>Failed count</th>
                     <th>Avg time</th>
                 </tr>
                 </thead>
@@ -31,7 +32,8 @@
                     <td>{{request.serverId}}</td>
                     <td>{{request.url}}</td>
                     <td>{{request.count}}</td>
-                    <td>{{request.avgDuration | millisecondsToHHMMSS}}</td>
+                    <td>{{request.failedCount}}</td>
+                    <td>{{request.avgDuration | number : 2}} ms</td>
                 </tr>
                 </tbody>
             </table>

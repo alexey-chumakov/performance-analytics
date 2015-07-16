@@ -52,8 +52,9 @@ import java.util.List;
                         "r.serverId as serverId, " +
                         "r.url as url, " +
                         "sum(r.count) as count, " +
+                        "sum(r.failedCount) as failedCount, " +
                         "sum(r.duration) as duration, " +
-                        "sum(r.duration) / sum(r.count) as avgDuration " +
+                        "(sum(r.duration) * 1.0) / sum(r.count) as avgDuration " +
                         "from Request r " +
                         "where :fromDate <= r.timestamp and r.timestamp <= :toDate " +
                         "group by r.year, r.month, r.day, r.hour, r.appName, r.serverId, r.url"),
