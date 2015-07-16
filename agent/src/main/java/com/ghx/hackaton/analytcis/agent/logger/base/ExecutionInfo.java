@@ -35,10 +35,8 @@ public class ExecutionInfo {
         return executionCount.get();
     }
 
-    public void increaseFailedCountTimes(long duration) {
+    public void increaseFailedCountTimes() {
         failedCount.incrementAndGet();
-        executionCount.incrementAndGet();
-        executionTimeTotal.addAndGet(duration);
     }
 
     public Integer getFailedCount() {

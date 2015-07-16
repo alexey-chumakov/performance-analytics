@@ -10,7 +10,6 @@ import com.ghx.hackaton.analytcis.agent.sender.Sender;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -53,22 +52,13 @@ public class RequestLogger {
         return requestLogger;
     }
 
-    public void logRequestCompleted(String contextPath, String url, Long processingTime) {
+    public void logRequestCompleted(String contextPath, String url, Long processingTime, boolean requestFailed) {
         try {
             ExecutionInfo info = getExecutionInfo(url, contextPath);
             info.increaseExecutionTimes(processingTime);
-            HashMap<String, ExecutionInfo> requestDetails = threadLocalStats.getAndCleanup();
-            info.addDetails(requestDetails);
-        } catch (Exception e) {
-            // Avoid any interruption in request processing
-            e.printStackTrace();
-        }
-    }
-
-    public void logRequestFailed(String contextPath, String url, Long processingTime) {
-        try {
-            ExecutionInfo info = getExecutionInfo(url, contextPath);
-            info.increaseFailedCountTimes(processingTime);
+            if (requestFailed) {
+                info.increaseFailedCountTimes();
+            }
             HashMap<String, ExecutionInfo> requestDetails = threadLocalStats.getAndCleanup();
             info.addDetails(requestDetails);
         } catch (Exception e) {

@@ -17,16 +17,16 @@ public class AnalyticsValve extends ValveBase {
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
+        boolean requestFailed = false;
         long start = System.currentTimeMillis();
         try {
             getNext().invoke(request, response);
-            long end = System.currentTimeMillis();
-            RequestLogger.getInstance().logRequestCompleted(request.getContextPath(), request.getRequestURL().toString(), end - start);
         } catch (RuntimeException e) {
-            long end = System.currentTimeMillis();
-            RequestLogger.getInstance().logRequestFailed(request.getContextPath(), request.getRequestURL().toString(), end - start);
+            requestFailed = true;
             throw e;
         } finally {
+            long end = System.currentTimeMillis();
+            RequestLogger.getInstance().logRequestCompleted(request.getContextPath(), request.getRequestURL().toString(), end - start, requestFailed);
         }
     }
 }
