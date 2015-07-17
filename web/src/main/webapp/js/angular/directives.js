@@ -72,7 +72,7 @@ angular
 
         return {
             restrict: 'E',
-            template: '<div></div>',
+            template: '<div style="height: 230px"></div>',
             scope: {
                 data: "=",
                 formatter: "="
@@ -97,7 +97,7 @@ angular
 
         return {
             restrict: 'E',
-            template: '<div></div>',
+            template: '<div style="height: 230px"></div>',
             scope: {
                 data: "=",
                 xkey: "=",
