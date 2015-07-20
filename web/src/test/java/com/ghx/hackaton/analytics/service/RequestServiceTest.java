@@ -24,6 +24,7 @@ public class RequestServiceTest  {
     private static String TEST_APP_NAME = "test_app_name";
     private static String TEST_SERVER_ID = "test_server_id";
     private static String TEST_URL = "test_url";
+    private static String ANOTHER_TEST_URL = "another_test_url";
     private static long TEST_COUNT = 10L;
     private static long TEST_DURATION = 1000L;
     private static Date TEST_DATE;
@@ -108,5 +109,61 @@ public class RequestServiceTest  {
         requestDetails.setDuration(duration);
         requestDetails.setRequest(request);
         return requestDetails;
+    }
+
+    @Ignore
+    @Test
+    public void fillTestData() {
+        long millisInAverageMonth = 2629743000l;
+        long millisInDay = 86400000l;
+        long millisInHour = 3600000l;
+
+        int durationAmplitude = 100;
+        int minimumDuration = 10;
+        int trendMaximumMultiplier = 3;
+        int lessRandom = 10; // the more lessRandom, the less random result we will have. lessRandom = 1 - max random
+
+        int requestsPerDay = 5;
+        long startDate = 1421712000000l; // 20 Jul 2014 0:00:00 GMT
+        long endDate = 1437350400000l; // 20 Jul 2015 0:00:00 GMT
+
+        long period = millisInDay / requestsPerDay;
+
+        //TEST_URL
+        long counter = 0;
+        for (long date = startDate; date < endDate; date += period) {
+            List<Request> testRequests1 = new ArrayList<Request>();
+            long mongoDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + (Math.random() + lessRandom - 1) / lessRandom * millisInHour)) + 1) * durationAmplitude / 2);
+            mongoDuration += Math.round((1 + Math.sin(date / millisInAverageMonth)) * durationAmplitude / 2); // add long sin
+            long sqlDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + (Math.random() + lessRandom - 1) / lessRandom * millisInHour)) + 1) * durationAmplitude / 2);
+            sqlDuration += Math.round(((Math.random() + lessRandom - 1) / lessRandom) * durationAmplitude * counter * trendMaximumMultiplier / ((endDate - startDate) / millisInDay * requestsPerDay)); // add trend
+            long totalDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + Math.random() * millisInHour)) + 1) * durationAmplitude / 2) + mongoDuration + sqlDuration;
+            Request req1 = createRequest(new Date(date), TEST_APP_NAME, TEST_SERVER_ID, TEST_URL, TEST_COUNT, totalDuration);
+            req1.getDetails().add(createRequestDetails("mongo", TEST_COUNT / 2, mongoDuration / 2, req1));
+            req1.getDetails().add(createRequestDetails("mysql", TEST_COUNT / 2, sqlDuration / 2, req1));
+            testRequests1.add(req1);
+
+            requestService.saveOrUpdate(testRequests1);
+            counter++;
+        }
+
+        //ANOTHER_TEST_URL
+        counter = 0;
+        for (long date = startDate; date < endDate; date += period) {
+            List<Request> testRequests1 = new ArrayList<Request>();
+            long mongoDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + (Math.random() + lessRandom - 1) / lessRandom * millisInHour)) + 1) * durationAmplitude / 2);
+            mongoDuration += Math.round((1 + Math.sin(date / millisInAverageMonth)) * durationAmplitude / 2); // add long sin
+            long sqlDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + (Math.random() + lessRandom - 1) / lessRandom * millisInHour)) + 1) * durationAmplitude / 2);
+            sqlDuration += Math.round(((Math.random() + lessRandom - 1) / lessRandom) * durationAmplitude * Math.tan(1.5 * (startDate - date) / (startDate - endDate)) * trendMaximumMultiplier); // add tangent trend
+            long totalDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + Math.random() * millisInHour)) + 1) * durationAmplitude / 2) + mongoDuration + sqlDuration;
+            Request req1 = createRequest(new Date(date), TEST_APP_NAME, TEST_SERVER_ID, ANOTHER_TEST_URL, TEST_COUNT, totalDuration);
+            req1.getDetails().add(createRequestDetails("mongo", TEST_COUNT / 2, mongoDuration / 2, req1));
+            req1.getDetails().add(createRequestDetails("mysql", TEST_COUNT / 2, sqlDuration / 2, req1));
+            testRequests1.add(req1);
+
+            requestService.saveOrUpdate(testRequests1);
+            counter++;
+        }
+        System.out.println(counter);
     }
 }
