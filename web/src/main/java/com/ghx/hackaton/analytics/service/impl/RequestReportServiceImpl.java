@@ -1,7 +1,9 @@
 package com.ghx.hackaton.analytics.service.impl;
 
+import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.dto.RequestDuration;
 import com.ghx.hackaton.analytics.model.report.RequestDurationReport;
+import com.ghx.hackaton.analytics.model.report.RequestUrlReport;
 import com.ghx.hackaton.analytics.service.RequestDetailsService;
 import com.ghx.hackaton.analytics.service.RequestReportService;
 import com.ghx.hackaton.analytics.service.RequestService;
@@ -123,5 +125,26 @@ public class RequestReportServiceImpl implements RequestReportService {
             durations.get(timestamp).put(rd.getSystemName(), rd.getAvgDuration());
         }
         report.setDailyDurations(durations);
+    }
+
+    @Override
+    public List<RequestUrlReport> getMostFrequentRequestsReport(Date from, Date to, String appName, int howMany) {
+        List<Request> mostFrequent = requestService.getMostFrequent(from, to, appName, howMany);
+
+        List<RequestUrlReport> reports = new ArrayList<RequestUrlReport>();
+
+        for (Request request : mostFrequent) {
+            RequestUrlReport report = new RequestUrlReport();
+            report.setUrl(request.getUrl());
+            report.setTotalCount(request.getCount());
+            report.setAvgDuration(request.getAvgDuration());
+            report.setDailyRequests(requestService.getAggregatedByDateForUrl(from, to, request.getUrl()));
+            for (Request daily : report.getDailyRequests()) {
+                daily.setTimestamp(DateUtil.timestamp(daily.getYear(), daily.getMonth(), daily.getDay()));
+            }
+            reports.add(report);
+        }
+
+        return reports;
     }
 }

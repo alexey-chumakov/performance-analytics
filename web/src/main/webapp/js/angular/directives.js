@@ -151,4 +151,21 @@ angular
             }
         };
     })
+
+    .directive('urlDetails', function() {
+
+        return {
+            restrict: 'EA',
+            replace: true,
+            scope: {
+                report: '=',
+                xkey:'=',
+                ykeys:'=',
+                labels:'='
+            },
+            templateUrl: _contextPath + '/js/angular/url-details.html',
+            link: function (scope, element, attr) {
+            }
+        };
+    })
 ;
