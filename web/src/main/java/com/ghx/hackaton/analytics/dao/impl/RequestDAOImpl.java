@@ -216,4 +216,16 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
                 .add(Projections.sum("duration"), "duration")
                 .add(Projections.sqlProjection("sum(DURATION)/sum(COUNT) AS AVG_DURATION", new String[] { "AVG_DURATION" }, new Type[] {DoubleType.INSTANCE }), "avgDuration"));
     }
+
+    @Override
+    public List<Request> getAggregatedByDateForUrl(Date from, Date to, String url) {
+        Query query = getSession().getNamedQuery(Request.SELECT_AGGREGATED_BY_DATE_FOR_URL_QUERY);
+        query.setLong("fromDate", from.getTime());
+        query.setLong("toDate", to.getTime());
+        query.setString("url", url);
+
+        query.setResultTransformer(Transformers.aliasToBean(Request.class));
+
+        return query.list();
+    }
 }

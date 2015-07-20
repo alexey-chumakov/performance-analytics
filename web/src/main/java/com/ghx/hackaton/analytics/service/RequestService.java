@@ -22,4 +22,6 @@ public interface RequestService {
 
     List<Request> getSlowest(Date from, Date to, String appName, int howMany);
 
+    List<Request> getAggregatedByDateForUrl(Date from, Date to, String url);
+
 }

@@ -13,6 +13,22 @@ import javax.persistence.Table;
 import java.util.List;
 
 @NamedQueries({
+        @NamedQuery(name = Request.SELECT_AGGREGATED_BY_DATE_FOR_URL_QUERY,
+                query = "select " +
+                        "r.year as year, " +
+                        "r.month as month, " +
+                        "r.day as day, " +
+                        "r.appName as appName, " +
+                        "r.serverId as serverId, " +
+                        "r.url as url, " +
+                        "sum(r.count) as count, " +
+                        "sum(r.failedCount) as failedCount, " +
+                        "sum(r.duration) as duration, " +
+                        "(sum(r.duration) * 1.0) / sum(r.count) as avgDuration " +
+                        "from Request r " +
+                        "where :fromDate <= r.timestamp and r.timestamp <= :toDate and r.url = :url " +
+                        "group by r.year, r.month, r.day"),
+
         @NamedQuery(name = Request.UPDATE_QUERY,
                 query = "update Request r set r.count = r.count + :newCount, r.failedCount = r.failedCount + :newFailedCount, " +
                         "r.duration = r.duration + :newDuration " +
@@ -29,6 +45,7 @@ import java.util.List;
 @Table(name = "REQUEST")
 public class Request extends AbstractEntity {
 
+    public static final String SELECT_AGGREGATED_BY_DATE_FOR_URL_QUERY = "Request.SELECT_AGGREGATED_BY_DATE_FOR_URL_QUERY";
     public static final String UPDATE_QUERY = "Request.UPDATE_QUERY";
     public static final String DELETE_BY_DATE_RANGE_QUERY = "Request.DELETE_BY_DATE_RANGE_QUERY";
 

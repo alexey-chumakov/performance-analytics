@@ -90,4 +90,9 @@ public class RequestServiceImpl implements RequestService {
     public List<Request> getSlowest(Date from, Date to, String appName, int howMany) {
         return requestDAO.getTopAggregatedByUrlSorted(from, to, appName, "avgDuration", false, howMany);
     }
+
+    @Override
+    public List<Request> getAggregatedByDateForUrl(Date from, Date to, String url) {
+        return requestDAO.getAggregatedByDateForUrl(from, to, url);
+    }
 }
