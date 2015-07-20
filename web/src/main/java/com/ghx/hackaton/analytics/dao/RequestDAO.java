@@ -24,4 +24,6 @@ public interface RequestDAO extends AbstractEntityDAO<Request> {
 
     List<Request> getAggregatedByDateForUrl(Date from, Date to, String url);
 
+    List<String> getAppURLs(String appName);
+
 }

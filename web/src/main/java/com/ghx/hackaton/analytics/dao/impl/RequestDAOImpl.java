@@ -228,4 +228,9 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
 
         return query.list();
     }
+
+    @Override
+    public List<String> getAppURLs(String appName) {
+        return getSession().createQuery("select distinct request.url from Request request").list();
+    }
 }

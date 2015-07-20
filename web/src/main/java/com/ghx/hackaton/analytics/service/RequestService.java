@@ -24,4 +24,6 @@ public interface RequestService {
 
     List<Request> getAggregatedByDateForUrl(Date from, Date to, String url);
 
+    List<String> getAppURLs(String appName);
+
 }

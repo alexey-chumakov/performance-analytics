@@ -32,6 +32,10 @@
     <script src="js/angular/slowest/controllers.js"></script>
     <script src="js/angular/slowest/services.js"></script>
 
+    <script src="js/angular/alerts/alerts.js"></script>
+    <script src="js/angular/alerts/controllers.js"></script>
+    <script src="js/angular/alerts/services.js"></script>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -77,23 +81,26 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#/">Performance analytics</a>
+            <a class="navbar-brand" href="#/">Performance Analytics</a>
         </div>
 
         <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav side-nav">
-                <li class="active">
+                <li class="">
                     <a href="#/request"><i class="fa fa-fw fa-info-circle"></i> Requests info</a>
                 </li>
-                <li class="active">
-                    <a href="#/duration"><i class="fa fa-fw fa-bar-chart-o"></i> Average request duration report</a>
+                <li class="">
+                    <a href="#/duration"><i class="fa fa-fw fa-bar-chart-o"></i> Applications</a>
                 </li>
-                <li class="active">
-                    <a href="#/frequent"><i class="fa fa-fw fa-star"></i> Top most frequent requests</a>
+                <li class="">
+                    <a href="#/frequent"><i class="fa fa-fw fa-star"></i> Most frequent requests</a>
                 </li>
-                <li class="active">
-                    <a href="#/slowest"><i class="fa fa-fw fa-clock-o"></i> Top slowest requests</a>
+                <li class="">
+                    <a href="#/slowest"><i class="fa fa-fw fa-clock-o"></i> Slowest requests</a>
+                </li>
+                <li class="">
+                    <a href="#/alerts"><i class="fa fa-fw fa-clock-o"></i> Alerts</a>
                 </li>
             </ul>
         </div>

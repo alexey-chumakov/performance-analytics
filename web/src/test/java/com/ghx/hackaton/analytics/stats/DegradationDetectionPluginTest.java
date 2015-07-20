@@ -12,14 +12,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class DegradationDetectorTest {
+public class DegradationDetectionPluginTest {
 
     @Autowired
-    private DegradationDetector degradationDetector;
+    private DegradationDetectionPlugin degradationDetector;
 
     @Test
     public void test() {
-        degradationDetector.alerts();
+        degradationDetector.alerts(null);
     }
 
 }
