@@ -2,6 +2,7 @@ package com.ghx.hackaton.analytics.web.controller;
 
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
+import com.ghx.hackaton.analytics.model.report.RequestUrlReport;
 import com.ghx.hackaton.analytics.service.RequestDetailsService;
 import com.ghx.hackaton.analytics.service.RequestReportService;
 import com.ghx.hackaton.analytics.service.RequestService;
@@ -64,12 +65,12 @@ public class RequestController {
 
     @RequestMapping(value = "/frequent")
     @ResponseBody
-    public List<Request> getMostFrequent(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+    public List<RequestUrlReport> getMostFrequent(@DateTimeFormat(pattern = UI_DATE_FORMAT)
                                      @RequestParam Calendar startDate,
                                      @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                      @RequestParam Calendar endDate,
                                      @RequestParam(required = false) String appName) {
-        return requestService.getMostFrequent(startDate.getTime(), endDate.getTime(), appName, TOP);
+        return requestReportService.getMostFrequentRequestsReport(startDate.getTime(), endDate.getTime(), appName, TOP);
     }
 
     @RequestMapping(value = "/slowest")

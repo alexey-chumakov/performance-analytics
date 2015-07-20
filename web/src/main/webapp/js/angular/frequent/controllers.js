@@ -10,7 +10,11 @@ angular.module('frequent-requests.controllers', [])
             };
             $scope.appName = null;
 
-            $scope.requests = [];
+            $scope.reports = [];
+
+            $scope.xkey = 'timestamp';
+            $scope.ykeys = ['avgDuration'];
+            $scope.labels = ['Average duration'];
 
             $scope.refresh = function() {
                 var filter = angular.extend({
@@ -18,7 +22,7 @@ angular.module('frequent-requests.controllers', [])
                 }, $scope.filter);
                 $location.search(filter).replace();
                 FrequentRequestsService.getRequests(filter).then(function (response) {
-                    $scope.requests = response;
+                    $scope.reports = response;
                 });
             };
 
