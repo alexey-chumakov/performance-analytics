@@ -5,25 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-@NamedNativeQueries({
-        @NamedNativeQuery(name = RequestDetails.SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY,
-                query = "SELECT " +
-                        "r.APP_NAME as appName, " +
-                        "rd.SYSTEM_NAME as systemName, " +
-                        "COALESCE (SUM(rd.COUNT), 0) as count, " +
-                        "COALESCE (SUM(rd.DURATION), 0) as duration, " +
-                        "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
-                        "FROM REQUEST_DETAILS rd JOIN REQUEST r on rd.REQUEST_ID = r.id " +
-                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY r.APP_NAME, rd.SYSTEM_NAME"
-        )
-})
 @NamedQueries({
         @NamedQuery(name = RequestDetails.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY,
                 query = "select " +
@@ -65,7 +50,6 @@ import javax.persistence.Table;
 @Table(name = "REQUEST_DETAILS")
 public class RequestDetails extends AbstractEntity {
 
-    public static final String SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY = "RequestDetails.SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY";
     public static final String SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY = "RequestDetails.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY";
     public static final String SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY = "RequestDetails.SELECT_AGGREGATED_BY_REQUEST_AND_DATE_RANGE_QUERY";
     public static final String UPDATE_QUERY = "RequestDetails.UPDATE_QUERY";

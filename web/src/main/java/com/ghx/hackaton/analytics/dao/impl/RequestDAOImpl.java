@@ -3,15 +3,20 @@ package com.ghx.hackaton.analytics.dao.impl;
 import com.ghx.hackaton.analytics.dao.RequestDAO;
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.dto.RequestDuration;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
+import org.hibernate.type.Type;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -19,6 +24,33 @@ import java.util.List;
 
 @Repository
 public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements RequestDAO {
+
+    private static final String SELECT_TOTAL_DURATION_QUERY_TEMPLATE = "SELECT " +
+            "r.APP_NAME as appName, " +
+            "COALESCE (SUM(r.COUNT), 0) as count, " +
+            "COALESCE (SUM(r.DURATION), 0) as duration, " +
+            "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
+            "FROM REQUEST r " +
+            "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate %s " +
+            "GROUP BY r.APP_NAME";
+
+    private static final String SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY_TEMPLATE =
+            "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, r.APP_NAME as appName, 'Total' as systemName, " +
+            "COALESCE (SUM(r.COUNT), 0) as count, " +
+            "COALESCE (SUM(r.DURATION), 0) as duration, " +
+            "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
+            "FROM REQUEST r " +
+            "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate %s " +
+            "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME) " +
+            "union " +
+            "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, r.APP_NAME as appName, rd.SYSTEM_NAME as systemName, " +
+            "COALESCE (SUM(rd.COUNT), 0) as count, " +
+            "COALESCE (SUM(rd.DURATION), 0) as duration, " +
+            "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
+            "FROM REQUEST_DETAILS rd JOIN REQUEST r ON r.id = rd.REQUEST_ID " +
+            "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate %s " +
+            "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME, rd.SYSTEM_NAME) " +
+            "ORDER BY year, month, day";
 
     @Override
     public int updateRequest(Request request) {
@@ -39,13 +71,29 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     }
 
     @Override
-    public List<Request> find(Date from, Date to) {
-        Query query = getSession().getNamedQuery(Request.SELECT_BY_DATE_RANGE_QUERY);
-        query.setLong("fromDate", from.getTime());
-        query.setLong("toDate", to.getTime());
-        query.setResultTransformer(Transformers.aliasToBean(getClazz()));
+    public List<Request> find(Date from, Date to, String appName) {
+        Criteria criteria = createCriteria(from, to, appName);
+        addProjection(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(Request.class));
 
-        return query.list();
+        return criteria.list();
+    }
+
+    private void addProjection(Criteria criteria) {
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("timestamp"), "timestamp")
+                .add(Projections.property("year"), "year")
+                .add(Projections.property("month"), "month")
+                .add(Projections.property("day"), "day")
+                .add(Projections.property("hour"), "hour")
+                .add(Projections.property("minute"), "minute")
+                .add(Projections.property("appName"), "appName")
+                .add(Projections.property("serverId"), "serverId")
+                .add(Projections.property("url"), "url")
+                .add(Projections.property("count"), "count")
+                .add(Projections.property("failedCount"), "failedCount")
+                .add(Projections.property("duration"), "duration")
+                .add(Projections.sqlProjection("DURATION /COUNT AS AVG_DURATION", new String[]{"AVG_DURATION"}, new Type[]{DoubleType.INSTANCE}), "avgDuration"));
     }
 
     @Override
@@ -74,10 +122,16 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     }
 
     @Override
-    public List<RequestDuration> getAggregatedByDate(Date from, Date to) {
-        SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY);
+    public List<RequestDuration> getAggregatedByDate(Date from, Date to, String appName) {
+        String where = buildWhere(appName);
+        String sql = String.format(SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY_TEMPLATE, where, where);
+
+        SQLQuery sqlQuery = getSession().createSQLQuery(sql);
         sqlQuery.setLong("fromDate", from.getTime());
         sqlQuery.setLong("toDate", to.getTime());
+        if (appName != null) {
+            sqlQuery.setString("appName",appName);
+        }
 
         sqlQuery.addScalar("year", IntegerType.INSTANCE)
                 .addScalar("month", IntegerType.INSTANCE)
@@ -94,10 +148,14 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     }
 
     @Override
-    public List<RequestDuration> getTotalByApp(Date from, Date to) {
-        SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(Request.SELECT_TOTAL_DURATION_QUERY);
+    public List<RequestDuration> getTotalByApp(Date from, Date to, String appName) {
+        String sql = String.format(SELECT_TOTAL_DURATION_QUERY_TEMPLATE, buildWhere(appName));
+        SQLQuery sqlQuery = getSession().createSQLQuery(sql);
         sqlQuery.setLong("fromDate", from.getTime());
         sqlQuery.setLong("toDate", to.getTime());
+        if (appName != null) {
+            sqlQuery.setString("appName",appName);
+        }
 
         sqlQuery.addScalar("appName", StringType.INSTANCE)
                 .addScalar("count", LongType.INSTANCE)
@@ -107,5 +165,55 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
         sqlQuery.setResultTransformer(Transformers.aliasToBean(RequestDuration.class));
 
         return sqlQuery.list();
+    }
+
+    private String buildWhere(String appName) {
+        String where = "";
+        if (appName != null) {
+            where += "and r.APP_NAME = :appName";
+        }
+        return where;
+    }
+
+    @Override
+    public List<Request> getTopAggregatedByUrlSorted(Date from, Date to, String appName, String field, boolean asc, int howMany) {
+        Criteria criteria = createCriteria(from, to, appName);
+
+        addAggregatedByUrlProjection(criteria);
+        addOrder(criteria, field, asc);
+        criteria.setResultTransformer(Transformers.aliasToBean(Request.class));
+        criteria.setMaxResults(howMany);
+
+        return criteria.list();
+    }
+
+    private Criteria createCriteria(Date from, Date to, String appName) {
+        Criteria criteria = getSession().createCriteria(Request.class)
+                .add(Restrictions.ge("timestamp", from.getTime()))
+                .add(Restrictions.le("timestamp", to.getTime()));
+
+        if (appName != null) {
+            criteria.add((Restrictions.eq("appName", appName)));
+        }
+
+        return criteria;
+    }
+
+    private void addOrder(Criteria criteria, String field, boolean asc) {
+        if (asc) {
+            criteria.addOrder(Order.asc(field));
+        } else {
+            criteria.addOrder(Order.desc(field));
+        }
+    }
+
+    private void addAggregatedByUrlProjection(Criteria criteria) {
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.groupProperty("appName"), "appName")
+                .add(Projections.groupProperty("serverId"), "serverId")
+                .add(Projections.groupProperty("url"), "url")
+                .add(Projections.sum("count"), "count")
+                .add(Projections.sum("duration"), "duration")
+                .add(Projections.sqlProjection("sum(DURATION)/sum(COUNT) AS AVG_DURATION", new String[] { "AVG_DURATION" }, new Type[] {DoubleType.INSTANCE }), "avgDuration"));
     }
 }

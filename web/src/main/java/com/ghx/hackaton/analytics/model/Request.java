@@ -1,66 +1,18 @@
 package com.ghx.hackaton.analytics.model;
 
+import org.hibernate.annotations.Formula;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
-@NamedNativeQueries({
-        @NamedNativeQuery(name = Request.SELECT_TOTAL_DURATION_QUERY,
-                query = "SELECT " +
-                        "r.APP_NAME as appName, " +
-                        "COALESCE (SUM(r.COUNT), 0) as count, " +
-                        "COALESCE (SUM(r.DURATION), 0) as duration, " +
-                        "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
-                        "FROM REQUEST r " +
-                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY r.APP_NAME"
-        ),
-        @NamedNativeQuery(name = Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY,
-                query = "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, r.APP_NAME as appName, 'Total' as systemName, " +
-                        "COALESCE (SUM(r.COUNT), 0) as count, " +
-                        "COALESCE (SUM(r.DURATION), 0) as duration, " +
-                        "COALESCE (SUM(r.DURATION) / SUM(r.COUNT), 0) as avgDuration " +
-                        "FROM REQUEST r " +
-                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME) " +
-                        "union " +
-                        "(SELECT r.YEAR as year, r.MONTH as month, r.DAY as day, r.APP_NAME as appName, rd.SYSTEM_NAME as systemName, " +
-                        "COALESCE (SUM(rd.COUNT), 0) as count, " +
-                        "COALESCE (SUM(rd.DURATION), 0) as duration, " +
-                        "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
-                        "FROM REQUEST_DETAILS rd JOIN REQUEST r ON r.id = rd.REQUEST_ID " +
-                        "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate " +
-                        "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME, rd.SYSTEM_NAME) " +
-                        "ORDER BY year, month, day"
-        )
-})
 @NamedQueries({
-        @NamedQuery(name = Request.SELECT_BY_DATE_RANGE_QUERY,
-                query = "select " +
-                        "r.timestamp as timestamp, " +
-                        "r.year as year, " +
-                        "r.month as month, " +
-                        "r.day as day, " +
-                        "r.hour as hour, " +
-                        "r.appName as appName, " +
-                        "r.serverId as serverId, " +
-                        "r.url as url, " +
-                        "r.count as count, " +
-                        "r.failedCount as failedCount, " +
-                        "r.duration as duration, " +
-                        "(r.duration * 1.0) / r.count as avgDuration " +
-                        "from Request r " +
-                        "where :fromDate <= r.timestamp and r.timestamp <= :toDate " +
-                        "order by r.timestamp"),
-
         @NamedQuery(name = Request.UPDATE_QUERY,
                 query = "update Request r set r.count = r.count + :newCount, r.failedCount = r.failedCount + :newFailedCount, " +
                         "r.duration = r.duration + :newDuration " +
@@ -77,10 +29,6 @@ import java.util.List;
 @Table(name = "REQUEST")
 public class Request extends AbstractEntity {
 
-    public static final String SELECT_TOTAL_DURATION_QUERY = "Request.SELECT_TOTAL_DURATION_QUERY";
-    public static final String SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY = "Request.SELECT_DAILY_AGGREGATES_BY_DATE_RANGE_QUERY";
-
-    public static final String SELECT_BY_DATE_RANGE_QUERY = "Request.SELECT_BY_DATE_RANGE_QUERY";
     public static final String UPDATE_QUERY = "Request.UPDATE_QUERY";
     public static final String DELETE_BY_DATE_RANGE_QUERY = "Request.DELETE_BY_DATE_RANGE_QUERY";
 
@@ -121,6 +69,7 @@ public class Request extends AbstractEntity {
     private Long duration;
 
     @Column(name = "AVG_DURATION", insertable = false, updatable = false)
+    @Formula("DURATION / COUNT")
     private Double avgDuration;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "request")

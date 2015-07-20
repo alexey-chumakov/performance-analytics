@@ -18,6 +18,16 @@ import java.util.List;
 @Repository
 public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails> implements RequestDetailsDAO {
 
+    public static final String SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY_TEMPLATE = "SELECT " +
+                    "r.APP_NAME as appName, " +
+                    "rd.SYSTEM_NAME as systemName, " +
+                    "COALESCE (SUM(rd.COUNT), 0) as count, " +
+                    "COALESCE (SUM(rd.DURATION), 0) as duration, " +
+                    "COALESCE (SUM(rd.DURATION) / SUM(rd.COUNT), 0) as avgDuration " +
+                    "FROM REQUEST_DETAILS rd JOIN REQUEST r on rd.REQUEST_ID = r.id " +
+                    "WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate %s " +
+                    "GROUP BY r.APP_NAME, rd.SYSTEM_NAME";
+
     @Override
     public int updateRequestDetails(RequestDetails requestDetails) {
         Query query = getSession().getNamedQuery(RequestDetails.UPDATE_QUERY);
@@ -53,10 +63,14 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
     }
 
     @Override
-    public List<RequestDuration> getTotalBySystemNames(Date from, Date to) {
-        SQLQuery sqlQuery = (SQLQuery) getSession().getNamedQuery(RequestDetails.SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY);
+    public List<RequestDuration> getTotalBySystemNames(Date from, Date to, String appName) {
+        String sql = String.format(SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY_TEMPLATE, buildWhere(appName));
+        SQLQuery sqlQuery = getSession().createSQLQuery(sql);
         sqlQuery.setLong("fromDate", from.getTime());
         sqlQuery.setLong("toDate", to.getTime());
+        if (appName != null) {
+            sqlQuery.setString("appName",appName);
+        }
 
         sqlQuery.addScalar("appName", StringType.INSTANCE)
                 .addScalar("systemName", StringType.INSTANCE)
@@ -67,5 +81,13 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
         sqlQuery.setResultTransformer(Transformers.aliasToBean(RequestDuration.class));
 
         return sqlQuery.list();
+    }
+
+    private String buildWhere(String appName) {
+        String where = "";
+        if (appName != null) {
+            where += "and r.APP_NAME = :appName";
+        }
+        return where;
     }
 }

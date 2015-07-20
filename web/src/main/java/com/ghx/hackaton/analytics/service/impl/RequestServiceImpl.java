@@ -61,8 +61,8 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> find(Date from, Date to) {
-        return requestDAO.find(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to));
+    public List<Request> find(Date from, Date to, String appName) {
+        return requestDAO.find(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to), appName);
     }
 
     @Override
@@ -72,12 +72,22 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<RequestDuration> getAggregatedByDate(Date from, Date to) {
-        return requestDAO.getAggregatedByDate(from, to);
+    public List<RequestDuration> getAggregatedByDate(Date from, Date to, String appName) {
+        return requestDAO.getAggregatedByDate(from, to, appName);
     }
 
     @Override
-    public List<RequestDuration> getTotalByApp(Date from, Date to) {
-        return requestDAO.getTotalByApp(from, to);
+    public List<RequestDuration> getTotalByApp(Date from, Date to, String appName) {
+        return requestDAO.getTotalByApp(from, to, appName);
+    }
+
+    @Override
+    public List<Request> getMostFrequent(Date from, Date to, String appName, int howMany) {
+        return requestDAO.getTopAggregatedByUrlSorted(from, to, appName, "count", false, howMany);
+    }
+
+    @Override
+    public List<Request> getSlowest(Date from, Date to, String appName, int howMany) {
+        return requestDAO.getTopAggregatedByUrlSorted(from, to, appName, "avgDuration", false, howMany);
     }
 }

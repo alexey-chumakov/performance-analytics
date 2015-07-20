@@ -26,7 +26,7 @@ public class RequestDetailsServiceImpl implements RequestDetailsService {
     }
 
     @Override
-    public List<RequestDuration> getTotalBySystemNames(Date from, Date to) {
-        return requestDetailsDAO.getTotalBySystemNames(from, to);
+    public List<RequestDuration> getTotalBySystemNames(Date from, Date to, String app) {
+        return requestDetailsDAO.getTotalBySystemNames(from, to, app);
     }
 }

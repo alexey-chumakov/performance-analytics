@@ -11,6 +11,6 @@ public interface RequestDetailsService {
 
     List<RequestDetails> findByRequest(Date from, Date to, Request request);
 
-    List<RequestDuration> getTotalBySystemNames(Date from, Date to);
+    List<RequestDuration> getTotalBySystemNames(Date from, Date to, String app);
 
 }

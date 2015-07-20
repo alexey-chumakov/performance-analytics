@@ -6,7 +6,7 @@
     </div>
 </div>
 
-<div control-panel filter="filter" refresh="refresh()"></div>
+<div control-panel filter="filter" app="appName" refresh="refresh()"></div>
 
 <div ng-repeat="report in reports">
     <div class="row">
@@ -42,6 +42,18 @@
                         <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <tr ng-repeat="avgRequestTime in report.avgRequestTimes">
+                        <td ng-class="{'highlighted': avgRequestTime.systemName == 'Total'}">{{avgRequestTime.systemName}}</td>
+                        <td ng-class="{'highlighted': avgRequestTime.systemName == 'Total'}">{{avgRequestTime.duration | number : 2}} ms</td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

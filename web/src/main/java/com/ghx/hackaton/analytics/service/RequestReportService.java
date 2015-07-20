@@ -6,5 +6,5 @@ import java.util.Date;
 import java.util.List;
 
 public interface RequestReportService {
-    List<RequestDurationReport> getDurationReport(Date from, Date to);
+    List<RequestDurationReport> getDurationReport(Date from, Date to, String appName);
 }

@@ -24,6 +24,14 @@
     <script src="js/angular/duration/controllers.js"></script>
     <script src="js/angular/duration/services.js"></script>
 
+    <script src="js/angular/frequent/frequent.js"></script>
+    <script src="js/angular/frequent/controllers.js"></script>
+    <script src="js/angular/frequent/services.js"></script>
+
+    <script src="js/angular/slowest/slowest.js"></script>
+    <script src="js/angular/slowest/controllers.js"></script>
+    <script src="js/angular/slowest/services.js"></script>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -76,10 +84,16 @@
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav side-nav">
                 <li class="active">
-                    <a href="#/request"><i class="fa fa-fw fa-dashboard"></i> Requests info</a>
+                    <a href="#/request"><i class="fa fa-fw fa-info-circle"></i> Requests info</a>
                 </li>
                 <li class="active">
                     <a href="#/duration"><i class="fa fa-fw fa-bar-chart-o"></i> Average request duration report</a>
+                </li>
+                <li class="active">
+                    <a href="#/frequent"><i class="fa fa-fw fa-star"></i> Top most frequent requests</a>
+                </li>
+                <li class="active">
+                    <a href="#/slowest"><i class="fa fa-fw fa-clock-o"></i> Top slowest requests</a>
                 </li>
             </ul>
         </div>

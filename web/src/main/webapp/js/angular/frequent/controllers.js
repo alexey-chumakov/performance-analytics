@@ -1,9 +1,9 @@
 'use strict';
 
-angular.module('request-info.controllers', [])
+angular.module('frequent-requests.controllers', [])
 
-    .controller('RequestController', ['$scope', '$location', 'RequestService',
-        function ($scope, $location, RequestService) {
+    .controller('FrequentRequestsController', ['$scope', '$location', 'FrequentRequestsService',
+        function ($scope, $location, FrequentRequestsService) {
             $scope.filter = {
                 startDate: moment().format("YYYY-MM-DD"),
                 endDate: moment().format("YYYY-MM-DD")
@@ -17,7 +17,7 @@ angular.module('request-info.controllers', [])
                     appName: $scope.appName
                 }, $scope.filter);
                 $location.search(filter).replace();
-                RequestService.getRequests(filter).then(function (response) {
+                FrequentRequestsService.getRequests(filter).then(function (response) {
                     $scope.requests = response;
                 });
             };

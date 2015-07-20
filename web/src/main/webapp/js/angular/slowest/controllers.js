@@ -1,9 +1,9 @@
 'use strict';
 
-angular.module('request-info.controllers', [])
+angular.module('slowest-requests.controllers', [])
 
-    .controller('RequestController', ['$scope', '$location', 'RequestService',
-        function ($scope, $location, RequestService) {
+    .controller('SlowestRequestsController', ['$scope', '$location', 'SlowestRequestsService',
+        function ($scope, $location, SlowestRequestsService) {
             $scope.filter = {
                 startDate: moment().format("YYYY-MM-DD"),
                 endDate: moment().format("YYYY-MM-DD")
@@ -17,7 +17,7 @@ angular.module('request-info.controllers', [])
                     appName: $scope.appName
                 }, $scope.filter);
                 $location.search(filter).replace();
-                RequestService.getRequests(filter).then(function (response) {
+                SlowestRequestsService.getRequests(filter).then(function (response) {
                     $scope.requests = response;
                 });
             };

@@ -5,7 +5,6 @@ import com.ghx.hackaton.analytics.model.RequestDetails;
 import com.ghx.hackaton.analytics.service.RequestDetailsService;
 import com.ghx.hackaton.analytics.service.RequestReportService;
 import com.ghx.hackaton.analytics.service.RequestService;
-import com.ghx.hackaton.analytics.web.bean.RequestBean;
 import com.ghx.hackaton.analytics.web.bean.RequestDurationReportBean;
 import com.ghx.hackaton.analytics.web.converter.ModelClientConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,6 +23,7 @@ import java.util.List;
 public class RequestController {
 
     private static final String UI_DATE_FORMAT = "yyyy-MM-dd";
+    private static final int TOP = 10;
 
     @Autowired
     private RequestService requestService;
@@ -33,18 +32,14 @@ public class RequestController {
     @Autowired
     private RequestReportService requestReportService;
 
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public void save(List<RequestBean> requests) {
-        requestService.saveOrUpdate(ModelClientConverter.requestsToModel(requests));
-    }
-
     @RequestMapping(value = "/forPeriod")
     @ResponseBody
     public List<Request> getRequests(@DateTimeFormat(pattern = UI_DATE_FORMAT)
                                     @RequestParam Calendar startDate,
                                     @DateTimeFormat(pattern = UI_DATE_FORMAT)
-                                    @RequestParam Calendar endDate) {
-        return requestService.find(startDate.getTime(), endDate.getTime());
+                                    @RequestParam Calendar endDate,
+                                    @RequestParam(required = false) String appName) {
+        return requestService.find(startDate.getTime(), endDate.getTime(), appName);
     }
 
     @RequestMapping(value = "/details")
@@ -62,7 +57,28 @@ public class RequestController {
     public List<RequestDurationReportBean> getDurationReport(@DateTimeFormat(pattern = UI_DATE_FORMAT)
                                                   @RequestParam Calendar startDate,
                                                   @DateTimeFormat(pattern = UI_DATE_FORMAT)
-                                                  @RequestParam Calendar endDate) {
-        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime()));
+                                                  @RequestParam Calendar endDate,
+                                                  @RequestParam(required = false) String appName) {
+        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime(), appName));
+    }
+
+    @RequestMapping(value = "/frequent")
+    @ResponseBody
+    public List<Request> getMostFrequent(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                     @RequestParam Calendar startDate,
+                                     @DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                     @RequestParam Calendar endDate,
+                                     @RequestParam(required = false) String appName) {
+        return requestService.getMostFrequent(startDate.getTime(), endDate.getTime(), appName, TOP);
+    }
+
+    @RequestMapping(value = "/slowest")
+    @ResponseBody
+    public List<Request> getSlowest(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                         @RequestParam Calendar startDate,
+                                         @DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                         @RequestParam Calendar endDate,
+                                         @RequestParam(required = false) String appName) {
+        return requestService.getSlowest(startDate.getTime(), endDate.getTime(), appName, TOP);
     }
 }

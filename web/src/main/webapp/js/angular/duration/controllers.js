@@ -8,16 +8,19 @@ angular.module('request-duration.controllers', [])
                 startDate: moment().format("YYYY-MM-DD"),
                 endDate: moment().format("YYYY-MM-DD")
             };
+            $scope.appName = null;
             $scope.durationFormatter = function(y, data) {
                 return $filter('number')(y, 2) + ' ms';
             };
             $scope.xkey = 'timestamp';
-
             $scope.reports = [];
 
             $scope.refresh = function() {
-                $location.search($scope.filter).replace();
-                RequestDurationService.getDurationReport($scope.filter).then(function (response) {
+                var filter = angular.extend({
+                    appName: $scope.appName
+                }, $scope.filter);
+                $location.search(filter).replace();
+                RequestDurationService.getDurationReport(filter).then(function (response) {
 
                     var newReports = [];
                     for (var i = 0; i < response.length; i++) {
@@ -28,6 +31,13 @@ angular.module('request-duration.controllers', [])
                                 value: totalRequestDuration.avgDuration
                             };
                         });
+                        var avgRequestTimes = report.totalRequestDurations.map(function(totalRequestDuration) {
+                            return {
+                                systemName: totalRequestDuration.systemName,
+                                duration: totalRequestDuration.avgDuration
+                            };
+                        });
+                        avgRequestTimes.push({systemName: 'Total', duration: report.totalDuration});
                         if (totalDurationReport.length == 0) {
                             totalDurationReport = [{value:"",label:""}];
                         }
@@ -49,11 +59,17 @@ angular.module('request-duration.controllers', [])
                             appName: report.appName,
                             totalDurationReport: totalDurationReport,
                             dailyDurationReport: dailyDurationReport,
-                            ykeys: ykeysArr
+                            ykeys: ykeysArr,
+                            avgRequestTimes: avgRequestTimes
                         });
                     }
 
                     $scope.reports = newReports;
+                    $scope.avgRequestTimes = avgRequestTimes;
                 });
             };
+
+            $scope.$watch('appName', function() {
+                $scope.refresh();
+            }, true);
         }]);

@@ -29,16 +29,16 @@ public class RequestReportServiceImpl implements RequestReportService {
     private RequestDetailsService requestDetailsService;
 
     @Override
-    public List<RequestDurationReport> getDurationReport(Date from, Date to) {
+    public List<RequestDurationReport> getDurationReport(Date from, Date to, String appName) {
 
         // appName -> total duration
-        Map<String, RequestDuration> appsTotalRequestDurations = groupByAppName(requestService.getTotalByApp(from, to));
+        Map<String, RequestDuration> appsTotalRequestDurations = groupByAppName(requestService.getTotalByApp(from, to, appName));
 
         // appName -> total duration by days and system names
-        Map<String, List<RequestDuration>> appsDailyRequestDurations = groupListByAppName(requestService.getAggregatedByDate(from, to));
+        Map<String, List<RequestDuration>> appsDailyRequestDurations = groupListByAppName(requestService.getAggregatedByDate(from, to, appName));
 
         // appName -> total duration by system names
-        Map<String, List<RequestDuration>> appsTotalBySystemName = groupListByAppName(requestDetailsService.getTotalBySystemNames(from, to));
+        Map<String, List<RequestDuration>> appsTotalBySystemName = groupListByAppName(requestDetailsService.getTotalBySystemNames(from, to, appName));
 
         Set<String> apps = new TreeSet<String>();
         apps.addAll(appsTotalRequestDurations.keySet());

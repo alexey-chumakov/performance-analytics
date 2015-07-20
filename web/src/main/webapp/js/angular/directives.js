@@ -55,9 +55,10 @@ angular
         return {
             restrict: 'EA',
             replace: true,
-            template: '<div class="row well"><div class="col-lg-3"><span date-picker filter="filter"></span> </div><div class="col-lg-3"><button type="button" class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> </button> </div> </div>',
+            template: '<div class="row well"><div class="col-lg-3"><span date-picker filter="filter"></span> </div><div class="col-lg-3"><span app-selector value="app"></span></div><div class="col-lg-3"><button type="button" class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> </button> </div> </div>',
             scope: {
                 'filter': '=',
+                'app': '=',
                 'refresh': '&'
             },
             link: function (scope, element, attr) {
@@ -127,6 +128,26 @@ angular
                     chart.options.labels = scope.labels;
                     chart.setData(scope.data);
                 }, true);
+            }
+        };
+    })
+
+    .directive('appSelector', function() {
+
+        return {
+            restrict: 'EA',
+            replace: true,
+            scope: {
+                value: '='
+            },
+            template: '<select class="form-control" ng-model="value" ng-options="app.value as app.key for app in apps"></select>',
+            link: function (scope, element, attr) {
+                scope.apps = [
+                    {key: '--All apps--',
+                        value: null},
+                    {key: '/heimdall',
+                        value: '/heimdall'}
+                ];
             }
         };
     })
