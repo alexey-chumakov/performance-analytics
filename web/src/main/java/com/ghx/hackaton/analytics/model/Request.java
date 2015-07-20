@@ -15,6 +15,7 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = Request.SELECT_AGGREGATED_BY_DATE_FOR_URL_QUERY,
                 query = "select " +
+                        "r.timestamp as timestamp, " +
                         "r.year as year, " +
                         "r.month as month, " +
                         "r.day as day, " +
