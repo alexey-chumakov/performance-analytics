@@ -9,4 +9,9 @@ angular.module('PerformanceAnalytics',
                 otherwise({
                     redirectTo: '/'
                 });
+            $routeProvider.
+                when('/', {
+                    templateUrl: _contextPath + '/main.html',
+                    reloadOnSearch: false
+                });
         }]);

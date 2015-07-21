@@ -6,6 +6,8 @@ angular.module('url-details.controllers', [])
         function ($scope, $location, $routeParams, $filter, UrlDetailsService, GlobalFilter) {
             $scope.filter = GlobalFilter.getFilter();
             $scope.reqUrl = $routeParams.reqUrl;
+            $scope.filter.dateRange.startDate = $routeParams.startDate;
+            $scope.filter.dateRange.endDate = $routeParams.endDate;
             $scope.durationFormatter = function(y, data) {
                 return $filter('number')(y, 2) + ' ms';
             };

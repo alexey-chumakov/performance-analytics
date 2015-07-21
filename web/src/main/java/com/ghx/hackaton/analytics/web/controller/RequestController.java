@@ -8,6 +8,7 @@ import com.ghx.hackaton.analytics.service.RequestReportService;
 import com.ghx.hackaton.analytics.service.RequestService;
 import com.ghx.hackaton.analytics.web.bean.RequestDurationReportBean;
 import com.ghx.hackaton.analytics.web.converter.ModelClientConverter;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -40,7 +41,7 @@ public class RequestController {
                                     @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                     @RequestParam Calendar endDate,
                                     @RequestParam(required = false) String appName) {
-        return requestService.find(startDate.getTime(), endDate.getTime(), appName);
+        return requestService.find(startDate.getTime(), DateUtils.addDays(endDate.getTime(), 1), appName);
     }
 
     @RequestMapping(value = "/details")
@@ -50,7 +51,7 @@ public class RequestController {
                                      @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                      @RequestParam Calendar endDate,
                                      @ModelAttribute Request request) {
-        return requestDetailsService.findByRequest(startDate.getTime(), endDate.getTime(), request);
+        return requestDetailsService.findByRequest(startDate.getTime(), DateUtils.addDays(endDate.getTime(), 1), request);
     }
 
     @RequestMapping(value = "/durationReport")
@@ -60,7 +61,7 @@ public class RequestController {
                                                   @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                                   @RequestParam Calendar endDate,
                                                   @RequestParam(required = false) String appName) {
-        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime(), appName, null));
+        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), DateUtils.addDays(endDate.getTime(), 1), appName, null));
     }
 
     @RequestMapping(value = "/frequent")
@@ -70,7 +71,7 @@ public class RequestController {
                                      @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                      @RequestParam Calendar endDate,
                                      @RequestParam(required = false) String appName) {
-        return requestService.getMostFrequent(startDate.getTime(), endDate.getTime(), appName, TOP);
+        return requestService.getMostFrequent(startDate.getTime(), DateUtils.addDays(endDate.getTime(), 1), appName, TOP);
     }
 
     @RequestMapping(value = "/slowest")
@@ -80,7 +81,7 @@ public class RequestController {
                                          @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                          @RequestParam Calendar endDate,
                                          @RequestParam(required = false) String appName) {
-        return requestService.getSlowest(startDate.getTime(), endDate.getTime(), appName, TOP);
+        return requestService.getSlowest(startDate.getTime(), DateUtils.addDays(endDate.getTime(), 1), appName, TOP);
     }
 
     @RequestMapping(value = "/url-details")
@@ -91,6 +92,6 @@ public class RequestController {
                                     @RequestParam Calendar endDate,
                                     @RequestParam String reqUrl,
                                     @RequestParam(required = false) String appName) {
-        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime(), appName, reqUrl));
+        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), DateUtils.addDays(endDate.getTime(), 1), appName, reqUrl));
     }
 }

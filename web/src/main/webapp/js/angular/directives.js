@@ -128,7 +128,9 @@ angular
                     {key: '--All apps--',
                         value: null},
                     {key: '/heimdall',
-                        value: '/heimdall'}
+                        value: '/heimdall'},
+                    {key: '/sample-app',
+                        value: '/sample-app'}
                 ];
             }
         };
@@ -156,7 +158,7 @@ angular
         return {
             restrict: 'EA',
             replace: true,
-            template: '<div><div class="col-lg-3 pull-right"><span date-picker filter="filter.dateRange"></span> </div><div class="col-lg-3 pull-right"><span app-selector value="filter.appName"></span></div></div>',
+            template: '<div><div class="col-lg-3 pull-right"><span app-selector value="filter.appName"></span></div><div class="col-lg-3 pull-right"><span date-picker filter="filter.dateRange"></span> </div></div>',
             scope: {
                 'filter': '=',
                 'app': '=',
