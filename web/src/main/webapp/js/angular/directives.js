@@ -51,24 +51,6 @@ angular
         }
     })
 
-    .directive('controlPanel', function () {
-        return {
-            restrict: 'EA',
-            replace: true,
-            template: '<div class="row well"><div class="col-lg-3"><span date-picker filter="filter"></span> </div><div class="col-lg-3"><span app-selector value="app"></span></div><div class="col-lg-3"><button type="button" class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> </button> </div> </div>',
-            scope: {
-                'filter': '=',
-                'app': '=',
-                'refresh': '&'
-            },
-            link: function (scope, element, attr) {
-                scope.$watch('filter', function() {
-                    scope.refresh();
-                }, true);
-            }
-        }
-    })
-
     .directive('pieChart', function() {
 
         return {
@@ -158,6 +140,7 @@ angular
             restrict: 'EA',
             replace: true,
             scope: {
+
                 startDate: '=',
                 endDate: '=',
                 appName: '=',
@@ -169,4 +152,23 @@ angular
         };
     })
 
+    .directive('panel', function (GlobalFilter) {
+        return {
+            restrict: 'EA',
+            replace: true,
+            template: '<div><div class="col-lg-3 pull-right"><span date-picker filter="filter.dateRange"></span> </div><div class="col-lg-3 pull-right"><span app-selector value="filter.appName"></span></div></div>',
+            scope: {
+                'filter': '=',
+                'app': '=',
+                'refresh': '&'
+            },
+            link: function (scope, element, attr) {
+                scope.filter = GlobalFilter.getFilter();
+                scope.$watch('filter', function() {
+                    GlobalFilter.setDateRange(scope.filter.dateRange);
+                    GlobalFilter.setAppName(scope.filter.appName);
+                }, true);
+            }
+        }
+    })
 ;

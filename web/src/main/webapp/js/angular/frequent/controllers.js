@@ -2,27 +2,24 @@
 
 angular.module('frequent-requests.controllers', [])
 
-    .controller('FrequentRequestsController', ['$scope', '$location', 'FrequentRequestsService',
-        function ($scope, $location, FrequentRequestsService) {
-            $scope.filter = {
-                startDate: moment().format("YYYY-MM-DD"),
-                endDate: moment().format("YYYY-MM-DD")
-            };
+    .controller('FrequentRequestsController', ['$scope', '$location', 'FrequentRequestsService', 'GlobalFilter',
+        function ($scope, $location, FrequentRequestsService, GlobalFilter) {
+            $scope.filter = GlobalFilter.getFilter();
             $scope.appName = null;
 
             $scope.requests = [];
 
             $scope.refresh = function() {
                 var filter = angular.extend({
-                    appName: $scope.appName
-                }, $scope.filter);
+                    appName: $scope.filter.appName
+                }, $scope.filter.dateRange);
                 $location.search(filter).replace();
                 FrequentRequestsService.getRequests(filter).then(function (response) {
                     $scope.requests = response;
                 });
             };
 
-            $scope.$watch('appName', function() {
+            $scope.$watch('filter', function() {
                 $scope.refresh();
             }, true);
         }]);
