@@ -15,6 +15,7 @@
     <script src="js/angular/app.js"></script>
     <script src="js/angular/directives.js"></script>
     <script src="js/angular/filters.js"></script>
+    <script src="js/angular/services.js"></script>
 
     <script src="js/angular/request/request.js"></script>
     <script src="js/angular/request/controllers.js"></script>
@@ -86,7 +87,10 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="#/">Performance Analytics</a>
+            <div style="padding-top: 8px" panel></div>
         </div>
+
+
 
         <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
         <div class="collapse navbar-collapse navbar-ex1-collapse">

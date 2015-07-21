@@ -2,27 +2,24 @@
 
 angular.module('request-info.controllers', [])
 
-    .controller('RequestController', ['$scope', '$location', 'RequestService',
-        function ($scope, $location, RequestService) {
-            $scope.filter = {
-                startDate: moment().format("YYYY-MM-DD"),
-                endDate: moment().format("YYYY-MM-DD")
-            };
+    .controller('RequestController', ['$scope', '$location', 'RequestService', 'GlobalFilter',
+        function ($scope, $location, RequestService, GlobalFilter) {
+            $scope.filter = GlobalFilter.getFilter();
             $scope.appName = null;
 
             $scope.requests = [];
 
             $scope.refresh = function() {
                 var filter = angular.extend({
-                    appName: $scope.appName
-                }, $scope.filter);
+                    appName: $scope.filter.appName
+                }, $scope.filter.dateRange);
                 $location.search(filter).replace();
                 RequestService.getRequests(filter).then(function (response) {
                     $scope.requests = response;
                 });
             };
 
-            $scope.$watch('appName', function() {
+            $scope.$watch('filter', function() {
                 $scope.refresh();
             }, true);
         }]);

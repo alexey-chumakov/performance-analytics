@@ -2,14 +2,10 @@
 
 angular.module('url-details.controllers', [])
 
-    .controller('UrlDetailsController', ['$scope', '$location', '$routeParams', '$filter', 'UrlDetailsService',
-        function ($scope, $location, $routeParams, $filter, UrlDetailsService) {
-            $scope.filter = {
-                startDate: $routeParams.startDate,
-                endDate: $routeParams.endDate
-            };
+    .controller('UrlDetailsController', ['$scope', '$location', '$routeParams', '$filter', 'UrlDetailsService', 'GlobalFilter',
+        function ($scope, $location, $routeParams, $filter, UrlDetailsService, GlobalFilter) {
+            $scope.filter = GlobalFilter.getFilter();
             $scope.reqUrl = $routeParams.reqUrl;
-            $scope.appName = $routeParams.appName;
             $scope.durationFormatter = function(y, data) {
                 return $filter('number')(y, 2) + ' ms';
             };
@@ -18,13 +14,13 @@ angular.module('url-details.controllers', [])
             $scope.reports = [];
 
             $scope.refresh = function() {
-                if ($scope.appName.length == 0) {
+                if ($scope.appName != null && $scope.appName.length == 0) {
                     $scope.appName = null;
                 }
                 var filter = angular.extend({
                     reqUrl: $scope.reqUrl,
-                    appName: $scope.appName
-                }, $scope.filter);
+                    appName: $scope.filter.appName
+                }, $scope.filter.dateRange);
                 $location.search(filter).replace();
                 UrlDetailsService.getDetails(filter).then(function (response) {
                     var newReports = [];
@@ -75,5 +71,7 @@ angular.module('url-details.controllers', [])
                 });
             };
 
-            $scope.refresh();
+            $scope.$watch('filter', function() {
+                $scope.refresh();
+            }, true);
         }]);

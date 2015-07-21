@@ -2,13 +2,9 @@
 
 angular.module('request-duration.controllers', [])
 
-    .controller('RequestDurationController', ['$scope', '$location', '$filter', 'RequestDurationService',
-        function ($scope, $location, $filter, RequestDurationService) {
-            $scope.filter = {
-                startDate: moment().format("YYYY-MM-DD"),
-                endDate: moment().format("YYYY-MM-DD")
-            };
-            $scope.appName = null;
+    .controller('RequestDurationController', ['$scope', '$location', '$filter', 'RequestDurationService', 'GlobalFilter',
+        function ($scope, $location, $filter, RequestDurationService, GlobalFilter) {
+            $scope.filter = GlobalFilter.getFilter();
             $scope.durationFormatter = function(y, data) {
                 return $filter('number')(y, 2) + ' ms';
             };
@@ -17,8 +13,8 @@ angular.module('request-duration.controllers', [])
 
             $scope.refresh = function() {
                 var filter = angular.extend({
-                    appName: $scope.appName
-                }, $scope.filter);
+                    appName: $scope.filter.appName
+                }, $scope.filter.dateRange);
                 $location.search(filter).replace();
                 RequestDurationService.getDurationReport(filter).then(function (response) {
 
@@ -69,7 +65,7 @@ angular.module('request-duration.controllers', [])
                 });
             };
 
-            $scope.$watch('appName', function() {
+            $scope.$watch('filter', function() {
                 $scope.refresh();
             }, true);
         }]);
