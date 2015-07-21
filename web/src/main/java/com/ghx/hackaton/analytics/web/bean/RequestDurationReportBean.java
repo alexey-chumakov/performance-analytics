@@ -9,6 +9,7 @@ import java.util.Map;
 public class RequestDurationReportBean {
 
     private String appName;
+    private String url;
     private Double totalDuration;
     private List<RequestDuration> totalRequestDurations;
 
@@ -21,6 +22,14 @@ public class RequestDurationReportBean {
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public Double getTotalDuration() {

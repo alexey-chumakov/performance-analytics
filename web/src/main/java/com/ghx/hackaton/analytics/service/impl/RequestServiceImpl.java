@@ -72,13 +72,13 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<RequestDuration> getAggregatedByDate(Date from, Date to, String appName) {
-        return requestDAO.getAggregatedByDate(from, to, appName);
+    public List<RequestDuration> getAggregatedByDate(Date from, Date to, String appName, String url) {
+        return requestDAO.getAggregatedByDate(from, to, appName, url);
     }
 
     @Override
-    public List<RequestDuration> getTotalByApp(Date from, Date to, String appName) {
-        return requestDAO.getTotalByApp(from, to, appName);
+    public List<RequestDuration> getTotalByApp(Date from, Date to, String appName, String url) {
+        return requestDAO.getTotalByApp(from, to, appName, url);
     }
 
     @Override

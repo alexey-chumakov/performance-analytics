@@ -15,6 +15,6 @@ public interface RequestDetailsDAO extends AbstractEntityDAO<RequestDetails> {
 
     void delete(Date from, Date to);
 
-    List<RequestDuration> getTotalBySystemNames(Date from, Date to, String appName);
+    List<RequestDuration> getTotalBySystemNames(Date from, Date to, String appName, String url);
 
 }

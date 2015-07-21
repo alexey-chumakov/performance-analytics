@@ -152,18 +152,17 @@ angular
         };
     })
 
-    .directive('urlDetails', function() {
+    .directive('urlStatistics', function() {
 
         return {
             restrict: 'EA',
             replace: true,
             scope: {
-                report: '=',
-                xkey:'=',
-                ykeys:'=',
-                labels:'='
+                filter: '=',
+                appName: '=',
+                url: '='
             },
-            templateUrl: _contextPath + '/js/angular/url-details.html',
+            template: '<a ng-href="#/url-details?startDate={{filter.startDate}}&endDate={{filter.endDate}}&appName={{appName}}&reqUrl={{url}}">{{url}}</a>',
             link: function (scope, element, attr) {
             }
         };

@@ -31,16 +31,16 @@ public class RequestReportServiceImpl implements RequestReportService {
     private RequestDetailsService requestDetailsService;
 
     @Override
-    public List<RequestDurationReport> getDurationReport(Date from, Date to, String appName) {
+    public List<RequestDurationReport> getDurationReport(Date from, Date to, String appName, String url) {
 
         // appName -> total duration
-        Map<String, RequestDuration> appsTotalRequestDurations = groupByAppName(requestService.getTotalByApp(from, to, appName));
+        Map<String, RequestDuration> appsTotalRequestDurations = groupByAppName(requestService.getTotalByApp(from, to, appName, url));
 
         // appName -> total duration by days and system names
-        Map<String, List<RequestDuration>> appsDailyRequestDurations = groupListByAppName(requestService.getAggregatedByDate(from, to, appName));
+        Map<String, List<RequestDuration>> appsDailyRequestDurations = groupListByAppName(requestService.getAggregatedByDate(from, to, appName, url));
 
         // appName -> total duration by system names
-        Map<String, List<RequestDuration>> appsTotalBySystemName = groupListByAppName(requestDetailsService.getTotalBySystemNames(from, to, appName));
+        Map<String, List<RequestDuration>> appsTotalBySystemName = groupListByAppName(requestDetailsService.getTotalBySystemNames(from, to, appName, url));
 
         Set<String> apps = new TreeSet<String>();
         apps.addAll(appsTotalRequestDurations.keySet());
@@ -57,6 +57,7 @@ public class RequestReportServiceImpl implements RequestReportService {
 
             RequestDurationReport report = new RequestDurationReport();
             report.setAppName(app);
+            report.setUrl(url);
             addTotalDurationInfo(totalRequestDuration, report);
             addTotalDurationsBySystemNameInfo(totalBySystemName, totalRequestDuration, report);
             addDailyDurationsInfo(dailyRequestDurations, report);
@@ -125,26 +126,5 @@ public class RequestReportServiceImpl implements RequestReportService {
             durations.get(timestamp).put(rd.getSystemName(), rd.getAvgDuration());
         }
         report.setDailyDurations(durations);
-    }
-
-    @Override
-    public List<RequestUrlReport> getMostFrequentRequestsReport(Date from, Date to, String appName, int howMany) {
-        List<Request> mostFrequent = requestService.getMostFrequent(from, to, appName, howMany);
-
-        List<RequestUrlReport> reports = new ArrayList<RequestUrlReport>();
-
-        for (Request request : mostFrequent) {
-            RequestUrlReport report = new RequestUrlReport();
-            report.setUrl(request.getUrl());
-            report.setTotalCount(request.getCount());
-            report.setAvgDuration(request.getAvgDuration());
-            report.setDailyRequests(requestService.getAggregatedByDateForUrl(from, to, request.getUrl()));
-            for (Request daily : report.getDailyRequests()) {
-                daily.setTimestamp(DateUtil.timestamp(daily.getYear(), daily.getMonth(), daily.getDay()));
-            }
-            reports.add(report);
-        }
-
-        return reports;
     }
 }

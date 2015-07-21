@@ -13,6 +13,7 @@ public class ModelClientConverter {
     public static RequestDurationReportBean toBean(RequestDurationReport report) {
         RequestDurationReportBean bean = new RequestDurationReportBean();
         bean.setAppName(report.getAppName());
+        bean.setUrl(report.getUrl());
         bean.setTotalDuration(report.getTotalDuration());
         bean.setTotalRequestDurations(report.getTotalRequestDurations());
 

@@ -63,13 +63,16 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
     }
 
     @Override
-    public List<RequestDuration> getTotalBySystemNames(Date from, Date to, String appName) {
-        String sql = String.format(SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY_TEMPLATE, buildWhere(appName));
+    public List<RequestDuration> getTotalBySystemNames(Date from, Date to, String appName, String url) {
+        String sql = String.format(SELECT_TOTAL_DURATION_BY_DATE_RANGE_QUERY_TEMPLATE, buildWhere(appName, url));
         SQLQuery sqlQuery = getSession().createSQLQuery(sql);
         sqlQuery.setLong("fromDate", from.getTime());
         sqlQuery.setLong("toDate", to.getTime());
         if (appName != null) {
-            sqlQuery.setString("appName",appName);
+            sqlQuery.setString("appName", appName);
+        }
+        if (url != null) {
+            sqlQuery.setString("url", url);
         }
 
         sqlQuery.addScalar("appName", StringType.INSTANCE)
@@ -83,10 +86,13 @@ public class RequestDetailsDAOImpl extends AbstractEntityDAOImpl<RequestDetails>
         return sqlQuery.list();
     }
 
-    private String buildWhere(String appName) {
+    private String buildWhere(String appName, String url) {
         String where = "";
         if (appName != null) {
-            where += "and r.APP_NAME = :appName";
+            where += "and r.APP_NAME = :appName ";
+        }
+        if (url != null) {
+            where += "and r.URL = :url ";
         }
         return where;
     }

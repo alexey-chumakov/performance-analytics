@@ -2,7 +2,7 @@ package com.ghx.hackaton.analytics.web.controller;
 
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
-import com.ghx.hackaton.analytics.model.report.RequestUrlReport;
+import com.ghx.hackaton.analytics.model.report.RequestDurationReport;
 import com.ghx.hackaton.analytics.service.RequestDetailsService;
 import com.ghx.hackaton.analytics.service.RequestReportService;
 import com.ghx.hackaton.analytics.service.RequestService;
@@ -60,17 +60,17 @@ public class RequestController {
                                                   @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                                   @RequestParam Calendar endDate,
                                                   @RequestParam(required = false) String appName) {
-        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime(), appName));
+        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime(), appName, null));
     }
 
     @RequestMapping(value = "/frequent")
     @ResponseBody
-    public List<RequestUrlReport> getMostFrequent(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+    public List<Request> getMostFrequent(@DateTimeFormat(pattern = UI_DATE_FORMAT)
                                      @RequestParam Calendar startDate,
                                      @DateTimeFormat(pattern = UI_DATE_FORMAT)
                                      @RequestParam Calendar endDate,
                                      @RequestParam(required = false) String appName) {
-        return requestReportService.getMostFrequentRequestsReport(startDate.getTime(), endDate.getTime(), appName, TOP);
+        return requestService.getMostFrequent(startDate.getTime(), endDate.getTime(), appName, TOP);
     }
 
     @RequestMapping(value = "/slowest")
@@ -81,5 +81,16 @@ public class RequestController {
                                          @RequestParam Calendar endDate,
                                          @RequestParam(required = false) String appName) {
         return requestService.getSlowest(startDate.getTime(), endDate.getTime(), appName, TOP);
+    }
+
+    @RequestMapping(value = "/url-details")
+    @ResponseBody
+    public List<RequestDurationReportBean> getUrlDetails(@DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                    @RequestParam Calendar startDate,
+                                    @DateTimeFormat(pattern = UI_DATE_FORMAT)
+                                    @RequestParam Calendar endDate,
+                                    @RequestParam String reqUrl,
+                                    @RequestParam(required = false) String appName) {
+        return ModelClientConverter.toBean(requestReportService.getDurationReport(startDate.getTime(), endDate.getTime(), appName, reqUrl));
     }
 }

@@ -14,9 +14,9 @@ public interface RequestService {
 
     void delete(Date from, Date to);
 
-    List<RequestDuration> getAggregatedByDate(Date from, Date to, String appName);
+    List<RequestDuration> getAggregatedByDate(Date from, Date to, String appName, String url);
 
-    List<RequestDuration> getTotalByApp(Date from, Date to, String appName);
+    List<RequestDuration> getTotalByApp(Date from, Date to, String appName, String url);
 
     List<Request> getMostFrequent(Date from, Date to, String appName, int howMany);
 
