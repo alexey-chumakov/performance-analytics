@@ -92,9 +92,6 @@
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav side-nav">
                 <li class="">
-                    <a href="#/request"><i class="fa fa-fw fa-info-circle"></i> Requests info</a>
-                </li>
-                <li class="">
                     <a href="#/duration"><i class="fa fa-fw fa-bar-chart-o"></i> Applications</a>
                 </li>
                 <li class="">

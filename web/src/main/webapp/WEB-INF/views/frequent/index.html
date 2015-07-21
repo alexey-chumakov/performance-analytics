@@ -27,7 +27,7 @@
                 <tr ng-repeat="request in requests">
                     <td>{{request.appName}}</td>
                     <td>{{request.serverId}}</td>
-                    <td><span url-statistics filter="filter" app-name="appName" url="request.url"></span></td>
+                    <td><span url-statistics startDate="filter.startDate" endDate="filter.endDate" app-name="request.appName" url="request.url"></span></td>
                     <td>{{request.count}}</td>
                     <td>{{request.avgDuration | number : 2}} ms</td>
                 </tr>

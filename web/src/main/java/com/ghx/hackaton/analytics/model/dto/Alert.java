@@ -1,9 +1,14 @@
 package com.ghx.hackaton.analytics.model.dto;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by achumakov on 7/20/2015.
  */
 public class Alert {
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private String application;
 
@@ -12,6 +17,10 @@ public class Alert {
     private String message;
 
     private Status status;
+
+    private String startDate;
+
+    private String endDate;
 
     public Alert(String application, String URL, String message, Status status) {
         this.application = application;
@@ -34,6 +43,19 @@ public class Alert {
 
     public Status getStatus() {
         return status;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setStartEndDates(Date start, Date end) {
+        startDate = dateFormat.format(start);
+        endDate = dateFormat.format(end);
     }
 
     @Override

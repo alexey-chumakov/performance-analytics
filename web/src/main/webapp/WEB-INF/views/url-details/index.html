@@ -9,14 +9,15 @@
 <!-- /.row -->
 
 <div ng-repeat="report in reports">
-    <div class="panel panel-green">
+    <div class="panel panel-primary">
         <div class="panel-heading">
             <div class="row">
                 <div class="col-xs-3">
                     <i class="fa fa-tasks fa-5x"></i>
                 </div>
                 <div class="col-xs-9 text-right">
-                    <div class="huge">{{ report.url }}</div>
+                    <div style="font-size: 24px;">{{ report.url }}</div>
+                    <div>request profile for <period></period></div>
                 </div>
             </div>
         </div>

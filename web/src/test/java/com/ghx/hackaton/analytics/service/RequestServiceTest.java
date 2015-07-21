@@ -16,16 +16,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public class RequestServiceTest  {
 
     private static String TEST_DATE_FORMAT = "yyyy-MM-dd HH:mm";
-    private static String TEST_APP_NAME = "test_app_name";
-    private static String TEST_SERVER_ID = "test_server_id";
-    private static String TEST_URL = "test_url";
-    private static String ANOTHER_TEST_URL = "another_test_url";
+    private static String TEST_APP_NAME = "/sample-app";
+    private static String TEST_SERVER_ID = "localhost";
+    private static String TEST_URL = "http://localhost:8080/test_url1";
+    private static String ANOTHER_TEST_URL = "http://localhost:8080/test_url2";
     private static long TEST_COUNT = 10L;
     private static long TEST_DURATION = 1000L;
     private static Date TEST_DATE;
@@ -43,9 +42,10 @@ public class RequestServiceTest  {
 
     @Before
     public void beforeClearTestData() {
-        requestService.delete(TEST_DATE, TEST_DATE);
+        //requestService.delete(TEST_DATE, TEST_DATE);
     }
 
+    @Ignore
     @Test
     public void testSaveOrUpdate() {
         List<Request> testRequests1 = new ArrayList<Request>();
@@ -82,7 +82,7 @@ public class RequestServiceTest  {
 
     @After
     public void afterClearTestData() {
-        requestService.delete(TEST_DATE, TEST_DATE);
+        //requestService.delete(TEST_DATE, TEST_DATE);
     }
 
     private Request createRequest(Date date, String appName, String serverId, String url, long count, long duration) {
@@ -112,7 +112,6 @@ public class RequestServiceTest  {
         return requestDetails;
     }
 
-    @Ignore
     @Test
     public void fillTestData() {
         long millisInAverageMonth = 2629743000l;
@@ -140,8 +139,8 @@ public class RequestServiceTest  {
             sqlDuration += Math.round(((Math.random() + lessRandom - 1) / lessRandom) * durationAmplitude * counter * trendMaximumMultiplier / ((endDate - startDate) / millisInDay * requestsPerDay)); // add trend
             long totalDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + Math.random() * millisInHour)) + 1) * durationAmplitude / 2) + mongoDuration + sqlDuration;
             Request req1 = createRequest(new Date(date), TEST_APP_NAME, TEST_SERVER_ID, TEST_URL, TEST_COUNT, totalDuration);
-            req1.getDetails().add(createRequestDetails("mongo", TEST_COUNT / 2, mongoDuration / 2, req1));
-            req1.getDetails().add(createRequestDetails("mysql", TEST_COUNT / 2, sqlDuration / 2, req1));
+            req1.getDetails().add(createRequestDetails("MONGO_DB", TEST_COUNT / 2, mongoDuration / 2, req1));
+            req1.getDetails().add(createRequestDetails("MYSQL", TEST_COUNT / 2, sqlDuration / 2, req1));
             testRequests1.add(req1);
 
             requestService.saveOrUpdate(testRequests1);
@@ -158,8 +157,8 @@ public class RequestServiceTest  {
             sqlDuration += Math.round(((Math.random() + lessRandom - 1) / lessRandom) * durationAmplitude * Math.tan(1.5 * (startDate - date) / (startDate - endDate)) * trendMaximumMultiplier); // add tangent trend
             long totalDuration = minimumDuration + Math.round((Math.sin(date / (millisInDay + Math.random() * millisInHour)) + 1) * durationAmplitude / 2) + mongoDuration + sqlDuration;
             Request req1 = createRequest(new Date(date), TEST_APP_NAME, TEST_SERVER_ID, ANOTHER_TEST_URL, TEST_COUNT, totalDuration);
-            req1.getDetails().add(createRequestDetails("mongo", TEST_COUNT / 2, mongoDuration / 2, req1));
-            req1.getDetails().add(createRequestDetails("mysql", TEST_COUNT / 2, sqlDuration / 2, req1));
+            req1.getDetails().add(createRequestDetails("MONGO_DB", TEST_COUNT / 2, mongoDuration / 2, req1));
+            req1.getDetails().add(createRequestDetails("MYSQL", TEST_COUNT / 2, sqlDuration / 2, req1));
             testRequests1.add(req1);
 
             requestService.saveOrUpdate(testRequests1);

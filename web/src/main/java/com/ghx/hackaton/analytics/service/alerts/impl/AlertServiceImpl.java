@@ -75,14 +75,16 @@ public class AlertServiceImpl implements AlertService {
             String message = String.format("One of Top %s most slowest requests. Called %s times for last %s days. "
                             + "Average request processing time is %s ms.",
                     TOP_N_RECORDS, request.getCount(), WARNING_PERIOD_IN_DAYS, request.getAvgDuration());
-            Alert warning = new Alert(appName, request.getUrl(), message, Alert.Status.warning);
+            Alert warning = new Alert(request.getAppName(), request.getUrl(), message, Alert.Status.warning);
+            warning.setStartEndDates(startDate, endDate);
             warnings.add(warning);
         }
         for (Request request : frequentRequests) {
             String message = String.format("One of Top %s most frequently called URLs. Called %s times for last %s days. "
                             + "Average request processing time is %s ms.",
                     TOP_N_RECORDS, request.getCount(), WARNING_PERIOD_IN_DAYS, request.getAvgDuration());
-            Alert warning = new Alert(appName, request.getUrl(), message, null);
+            Alert warning = new Alert(request.getAppName(), request.getUrl(), message, null);
+            warning.setStartEndDates(startDate, endDate);
             warnings.add(warning);
         }
         return warnings;

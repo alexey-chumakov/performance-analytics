@@ -27,22 +27,29 @@ public class DegradationDetectionPlugin implements AlertPlugin {
     @Autowired
     private RequestService requestService;
 
+    // TODO refactor this
     public Collection<Alert> alerts() {
         Set<Alert> alerts = new HashSet<Alert>();
         List<String> appNames = requestService.getAppNames();
         for (String appName : appNames) {
             for (String url : requestService.getAppURLs(appName)) {
                 // process 5 day short-term degradation
+                Date endDate = new Date();
+                Date startDate = DateUtils.addDays(endDate, -7);
                 String message = getDegradationAlerts(url, 7);
                 if (message != null) {
                     Alert alert = new Alert(appName, url, message, Alert.Status.danger);
+                    alert.setStartEndDates(startDate, endDate);
                     alerts.add(alert);
                 }
 
                 // process 30 day long-term degradation
+                endDate = new Date();
+                startDate = DateUtils.addDays(endDate, -30);
                 message = getDegradationAlerts(url, 30);
                 if (message != null) {
                     Alert alert = new Alert(appName, url, message, Alert.Status.danger);
+                    alert.setStartEndDates(startDate, endDate);
                     alerts.add(alert);
                 }
             }

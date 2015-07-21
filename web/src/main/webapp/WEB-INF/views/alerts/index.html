@@ -23,7 +23,7 @@
                 <tbody>
                 <tr class="{{alert.status}}" ng-repeat="alert in alerts">
                     <td><i ng-if="alert.status === 'danger'" class="fa fa-exclamation-triangle" style="color: red"></i> {{alert.message}}</td>
-                    <td>{{alert.url}}</td>
+                    <td><span url-statistics start-date="alert.startDate" end-date="alert.endDate" app-name="alert.application" url="alert.url"></span></td>
                 </tr>
                 </tbody>
             </table>

@@ -158,13 +158,15 @@ angular
             restrict: 'EA',
             replace: true,
             scope: {
-                filter: '=',
+                startDate: '=',
+                endDate: '=',
                 appName: '=',
                 url: '='
             },
-            template: '<a ng-href="#/url-details?startDate={{filter.startDate}}&endDate={{filter.endDate}}&appName={{appName}}&reqUrl={{url}}">{{url}}</a>',
+            template: '<a ng-href="#/url-details?startDate={{startDate}}&endDate={{endDate}}&appName={{appName}}&reqUrl={{url}}">{{url}}</a>',
             link: function (scope, element, attr) {
             }
         };
     })
+
 ;
