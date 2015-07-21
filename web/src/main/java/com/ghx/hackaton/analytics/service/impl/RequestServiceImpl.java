@@ -96,6 +96,10 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getAggregatedByDateForUrl(from, to, url);
     }
 
+    public List<String> getAppNames() {
+        return requestDAO.getAppNames();
+    }
+
     @Override
     public List<String> getAppURLs(String appName) {
         return requestDAO.getAppURLs(appName);

@@ -1,8 +1,9 @@
-package com.ghx.hackaton.analytics.stats;
+package com.ghx.hackaton.analytics.service.alerts.impl;
 
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.dto.Alert;
 import com.ghx.hackaton.analytics.service.RequestService;
+import com.ghx.hackaton.analytics.service.alerts.AlertPlugin;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.commons.math3.util.Pair;
@@ -15,7 +16,7 @@ import java.util.*;
  * Created by achumakov on 7/20/2015.
  */
 @Component
-public class DegradationDetectionPlugin {
+public class DegradationDetectionPlugin implements AlertPlugin {
 
     private static final double STAT_SAMPLE_PERCENTAGE_THRESHOLD = 0.8;
 
@@ -26,21 +27,24 @@ public class DegradationDetectionPlugin {
     @Autowired
     private RequestService requestService;
 
-    public Collection<Alert> alerts(String appName) {
+    public Collection<Alert> alerts() {
         Set<Alert> alerts = new HashSet<Alert>();
-        for (String url : requestService.getAppURLs(appName)) {
-            // process 5 day short-term degradation
-            String message = getDegradationAlerts(url, 5);
-            if (message != null) {
-                Alert alert = new Alert(null, url, message, Alert.Status.danger);
-                alerts.add(alert);
-            }
+        List<String> appNames = requestService.getAppNames();
+        for (String appName : appNames) {
+            for (String url : requestService.getAppURLs(appName)) {
+                // process 5 day short-term degradation
+                String message = getDegradationAlerts(url, 7);
+                if (message != null) {
+                    Alert alert = new Alert(appName, url, message, Alert.Status.danger);
+                    alerts.add(alert);
+                }
 
-            // process 30 day long-term degradation
-            message = getDegradationAlerts(url, 30);
-            if (message != null) {
-                Alert alert = new Alert(null, url, message, Alert.Status.danger);
-                alerts.add(alert);
+                // process 30 day long-term degradation
+                message = getDegradationAlerts(url, 30);
+                if (message != null) {
+                    Alert alert = new Alert(appName, url, message, Alert.Status.danger);
+                    alerts.add(alert);
+                }
             }
         }
 

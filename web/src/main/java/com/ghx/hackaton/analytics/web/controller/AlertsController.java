@@ -1,7 +1,8 @@
 package com.ghx.hackaton.analytics.web.controller;
 
 import com.ghx.hackaton.analytics.model.dto.Alert;
-import com.ghx.hackaton.analytics.stats.DegradationDetectionPlugin;
+import com.ghx.hackaton.analytics.service.alerts.AlertService;
+import com.ghx.hackaton.analytics.service.alerts.impl.DegradationDetectionPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +19,12 @@ import java.util.Collection;
 public class AlertsController {
 
     @Autowired
-    private DegradationDetectionPlugin degradationDetectionPlugin;
+    private AlertService alertService;
 
     @RequestMapping
     @ResponseBody
     public Collection<Alert> getAlerts(@RequestParam(required = false) String appName) {
-        return degradationDetectionPlugin.alerts(appName);
+        return alertService.getAlerts(appName);
     }
 
 }

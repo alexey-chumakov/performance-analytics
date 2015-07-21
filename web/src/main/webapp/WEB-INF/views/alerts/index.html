@@ -21,8 +21,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="danger" ng-repeat="alert in alerts">
-                    <td>{{alert.message}}</td>
+                <tr class="{{alert.status}}" ng-repeat="alert in alerts">
+                    <td><i ng-if="alert.status === 'danger'" class="fa fa-exclamation-triangle" style="color: red"></i> {{alert.message}}</td>
                     <td>{{alert.url}}</td>
                 </tr>
                 </tbody>

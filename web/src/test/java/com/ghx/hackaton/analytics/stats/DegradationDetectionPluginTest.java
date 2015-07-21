@@ -1,11 +1,16 @@
 package com.ghx.hackaton.analytics.stats;
 
+import com.ghx.hackaton.analytics.model.dto.Alert;
+import com.ghx.hackaton.analytics.service.alerts.impl.DegradationDetectionPlugin;
 import com.ghx.hackaton.analytics.spring.TestConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by achumakov on 7/20/2015.
@@ -19,7 +24,10 @@ public class DegradationDetectionPluginTest {
 
     @Test
     public void test() {
-        degradationDetector.alerts(null);
+        Collection<Alert> alerts = degradationDetector.alerts();
+        for (Alert alert : alerts) {
+            System.out.println(alert);
+        }
     }
 
 }
