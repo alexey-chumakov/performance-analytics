@@ -93,25 +93,27 @@ public class RequestReportServiceImpl implements RequestReportService {
     }
 
     private void addTotalDurationsBySystemNameInfo(List<RequestDuration> totalBySystemName, RequestDuration totalDuration, RequestDurationReport report) {
-        addOtherDuration(totalDuration.getAvgDuration(), totalSystemDuration(totalBySystemName), totalBySystemName);
+        addOtherDuration(totalDuration, totalSystemDuration(totalBySystemName), totalBySystemName);
         report.setTotalRequestDurations(totalBySystemName);
     }
 
-    private double totalSystemDuration(List<RequestDuration> totalBySystemName) {
+    private long totalSystemDuration(List<RequestDuration> totalBySystemName) {
         long totalDuration = 0;
-        long totalCount = 0;
         for (RequestDuration requestDuration : totalBySystemName) {
             totalDuration += requestDuration.getDuration();
-            totalCount += requestDuration.getCount();
         }
-        return totalCount != 0 ? (double) totalDuration / totalCount : 0;
+        return totalDuration;
     }
 
-    private void addOtherDuration(double totalDuration, double totalSystemDuration, List<RequestDuration> totalBySystemName) {
+    private void addOtherDuration(RequestDuration total, long totalSystemDuration, List<RequestDuration> totalBySystemName) {
         RequestDuration requestDuration = new RequestDuration();
-        requestDuration.setAvgDuration(totalDuration - totalSystemDuration);
+        requestDuration.setAvgDuration(avg(total.getDuration() - totalSystemDuration, total.getCount()));
         requestDuration.setSystemName(JAVA_KEY);
         totalBySystemName.add(requestDuration);
+    }
+
+    private double avg(long total, long count) {
+        return count != 0 ? (double) total / count : 0;
     }
 
     private void addDailyDurationsInfo(List<RequestDuration> dailyRequestDurations, RequestDurationReport report) {
