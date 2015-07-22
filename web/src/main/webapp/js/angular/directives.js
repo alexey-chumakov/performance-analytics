@@ -114,7 +114,7 @@ angular
         };
     })
 
-    .directive('appSelector', function() {
+    .directive('appSelector', function(ApplicationService) {
 
         return {
             restrict: 'EA',
@@ -125,13 +125,13 @@ angular
             template: '<select class="form-control" ng-model="value" ng-options="app.value as app.key for app in apps"></select>',
             link: function (scope, element, attr) {
                 scope.apps = [
-                    {key: '--All apps--',
-                        value: null},
-                    {key: '/heimdall',
-                        value: '/heimdall'},
-                    {key: '/sample-app',
-                        value: '/sample-app'}
-                ];
+                    { key: '-All Applications-', value: null }
+                ].concat(ApplicationService.getAppNames().map(function(appName) {
+                        return {
+                            key: appName,
+                            value: appName
+                        };
+                    }));
             }
         };
     })
