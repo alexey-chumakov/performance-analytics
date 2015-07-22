@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public class RequestServiceTest  {
@@ -24,8 +23,8 @@ public class RequestServiceTest  {
     private static String TEST_DATE_FORMAT = "yyyy-MM-dd HH:mm";
     private static String TEST_APP_NAME = "/sample-app";
     private static String TEST_SERVER_ID = "localhost";
-    private static String TEST_URL = "http://localhost:8080/test_url1";
-    private static String ANOTHER_TEST_URL = "http://localhost:8080/test_url2";
+    private static String TEST_URL = "http://localhost:8080/sample-app/test_url1";
+    private static String ANOTHER_TEST_URL = "http://localhost:8080/sample-app/test_url2";
     private static long TEST_COUNT = 10L;
     private static long TEST_DURATION = 1000L;
     private static Date TEST_DATE;
@@ -126,7 +125,7 @@ public class RequestServiceTest  {
 
         int requestsPerDay = 5;
         long startDate = 1421712000000l; // 20 Jul 2014 0:00:00 GMT
-        long endDate = 1437350400000l; // 20 Jul 2015 0:00:00 GMT
+        long endDate = new Date().getTime(); // 20 Jul 2015 0:00:00 GMT
 
         long period = millisInDay / requestsPerDay;
 
