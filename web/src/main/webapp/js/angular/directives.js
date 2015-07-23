@@ -173,4 +173,119 @@ angular
             }
         }
     })
+
+    .directive('sortField', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            template: '<a href="" ng-click="setOrder(field)">{{title}}<span ng-show="isDescending(field)" class="fa fa-caret-down"></span><span ng-show="isAscending(field)" class="fa fa-caret-up"></span> </a>',
+            scope: {
+                sort: '=',
+                field: '@',
+                title: '@',
+                onChange: '&'
+            },
+            link: function (scope, element, attr) {
+                scope.setOrder = function(field){
+                    if (scope.sort.field == field) {
+                        scope.sort.asc = !scope.sort.asc;
+                    } else {
+                        scope.sort.field = field;
+                        scope.sort.asc = true;
+                    }
+                };
+
+                scope.isAscending = function(field){
+                    return scope.sort.field == field && scope.sort.asc;
+                };
+
+                scope.isDescending = function(field){
+                    return scope.sort.field == field && !scope.sort.asc;
+                };
+
+                scope.$watch('sort', function() {
+                    if (typeof scope.onChange === 'function') {
+                        scope.onChange();
+                    }
+                }, true);
+            }
+        }
+    })
+
+    .directive('pagination', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            template: '<ul class="pagination">' +
+            '<li ng-class="{disabled: !hasPrev()}" ng-click="previous()"><a href>&lsaquo;</a></li> ' +
+            '<li ng-repeat="p in pagesArr" ng-class="{active: isActive(p)}" ng-click="setPage(p)"><a href>{{ p }}</a></li> ' +
+            '<li ng-show="showDots()" ng-click="next()"><a href>...</a></li>' +
+            '<li ng-class="{disabled: !hasNext()}" ng-click="next()"><a href>&rsaquo;</a></li> ' +
+            '</ul>',
+            scope: {
+                pagination: '=',
+                hasMore: '&',
+                onChange: "&"
+            },
+            link: function (scope, element, attr) {
+                var pagesArray = function() {
+                    var pagesArr=[];
+                    var lastPage;
+                    if (scope.pagination.totalPages) {
+                        lastPage = scope.pagination.totalPages;
+                    } else {
+                        lastPage = scope.pagination.page;
+                    }
+                    for (var i = 1; i <= lastPage; i++) {
+                        pagesArr.push(i);
+                    }
+                    return pagesArr;
+                };
+
+                scope.setPage = function(page){
+                    scope.pagination.page = page;
+                };
+
+                scope.previous = function() {
+                    if (scope.hasPrev()) {
+                        scope.pagination.page--;
+                    }
+                };
+                scope.hasPrev = function() {
+                    return scope.pagination.page > 1;
+                };
+
+                scope.next = function() {
+                    if (scope.hasNext()) {
+                        scope.pagination.page++;
+                        if (scope.pagesArr[scope.pagesArr.length - 1] < scope.pagination.page) {
+                            scope.pagesArr.push(scope.pagination.page);
+                        }
+                    }
+                };
+
+                scope.hasNext = function() {
+                    if (typeof scope.hasMore === 'function') {
+                        return scope.hasMore();
+                    }
+                    return false;
+                };
+
+                scope.isActive = function(page) {
+                    return scope.pagination.page == page;
+                };
+
+                scope.showDots = function() {
+                    return !scope.pagination.totalPages && scope.hasMore();
+                };
+
+                scope.$watch('pagination', function() {
+                    if (typeof scope.onChange === 'function') {
+                        scope.onChange();
+                    }
+                    scope.pagesArr = pagesArray();
+                }, true);
+            }
+        }
+    })
 ;

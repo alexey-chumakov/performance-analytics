@@ -25,14 +25,6 @@
     <script src="js/angular/duration/controllers.js"></script>
     <script src="js/angular/duration/services.js"></script>
 
-    <script src="js/angular/frequent/frequent.js"></script>
-    <script src="js/angular/frequent/controllers.js"></script>
-    <script src="js/angular/frequent/services.js"></script>
-
-    <script src="js/angular/slowest/slowest.js"></script>
-    <script src="js/angular/slowest/controllers.js"></script>
-    <script src="js/angular/slowest/services.js"></script>
-
     <script src="js/angular/alerts/alerts.js"></script>
     <script src="js/angular/alerts/controllers.js"></script>
     <script src="js/angular/alerts/services.js"></script>
@@ -99,13 +91,10 @@
                     <a href="#/duration"><i class="fa fa-fw fa-bar-chart-o"></i> Applications</a>
                 </li>
                 <li class="">
-                    <a href="#/frequent"><i class="fa fa-fw fa-star"></i> Most frequent requests</a>
+                    <a href="#/request"><i class="fa fa-fw fa-star"></i> Application requests</a>
                 </li>
                 <li class="">
-                    <a href="#/slowest"><i class="fa fa-fw fa-clock-o"></i> Slowest requests</a>
-                </li>
-                <li class="">
-                    <a href="#/alerts"><i class="fa fa-fw fa-clock-o"></i> Alerts</a>
+                    <a href="#/alerts"><i class="fa fa-fw fa-bell"></i> Alerts</a>
                 </li>
             </ul>
         </div>

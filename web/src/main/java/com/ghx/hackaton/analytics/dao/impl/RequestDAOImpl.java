@@ -3,12 +3,12 @@ package com.ghx.hackaton.analytics.dao.impl;
 import com.ghx.hackaton.analytics.dao.RequestDAO;
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.dto.RequestDuration;
+import com.ghx.hackaton.analytics.service.pagination.Pagination;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -52,6 +52,9 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
             "GROUP BY r.YEAR, r.MONTH, r.DAY, r.APP_NAME, rd.SYSTEM_NAME) " +
             "ORDER BY year, month, day";
 
+    private static final String COUNT_DISTINCT_APP_SERVER_URL_TEMPLATE = "SELECT " +
+            "COUNT(*) as count FROM (SELECT * FROM REQUEST r WHERE :fromDate <= r.TIMESTAMP and r.TIMESTAMP <= :toDate %s GROUP BY r.APP_NAME, r.SERVER_ID, r.URL) sub";
+
     @Override
     public int updateRequest(Request request) {
         Query query = getSession().getNamedQuery(Request.UPDATE_QUERY);
@@ -71,7 +74,7 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     }
 
     @Override
-    public List<Request> find(Date from, Date to, String appName) {
+    public List<Request> findAll(Date from, Date to, String appName) {
         Criteria criteria = createCriteria(from, to, appName);
         addProjection(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(Request.class));
@@ -185,13 +188,13 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
     }
 
     @Override
-    public List<Request> getTopAggregatedByUrlSorted(Date from, Date to, String appName, String field, boolean asc, int howMany) {
+    public List<Request> getAggregatedByUrlSorted(Date from, Date to, String appName, com.ghx.hackaton.analytics.service.order.Order order, Pagination pagination) {
         Criteria criteria = createCriteria(from, to, appName);
 
         addAggregatedByUrlProjection(criteria);
-        addOrder(criteria, field, asc);
+        addOrder(criteria, order);
+        addPagination(criteria, pagination);
         criteria.setResultTransformer(Transformers.aliasToBean(Request.class));
-        criteria.setMaxResults(howMany);
 
         return criteria.list();
     }
@@ -208,11 +211,16 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
         return criteria;
     }
 
-    private void addOrder(Criteria criteria, String field, boolean asc) {
-        if (asc) {
-            criteria.addOrder(Order.asc(field));
-        } else {
-            criteria.addOrder(Order.desc(field));
+    private void addOrder(Criteria criteria,  com.ghx.hackaton.analytics.service.order.Order order) {
+        if (order != null) {
+            criteria.addOrder(order.isAscending() ? Order.asc(order.getSortField()) : Order.desc(order.getSortField()));
+        }
+    }
+
+    private void addPagination(Criteria criteria, Pagination pagination) {
+        if (pagination != null) {
+            criteria.setFirstResult(pagination.getFirstResult());
+            criteria.setMaxResults(pagination.getItemsPerPage());
         }
     }
 
@@ -251,5 +259,20 @@ public class RequestDAOImpl extends AbstractEntityDAOImpl<Request> implements Re
                 .createQuery("select distinct request.url from Request request where request.appName = :appName")
                 .setString("appName", appName)
                 .list();
+    }
+
+    @Override
+    public long aggregatedByUrlCount(Date from, Date to, String appName) {
+        String sql = String.format(COUNT_DISTINCT_APP_SERVER_URL_TEMPLATE, buildWhere(appName, null));
+        SQLQuery sqlQuery = getSession().createSQLQuery(sql);
+        sqlQuery.setLong("fromDate", from.getTime());
+        sqlQuery.setLong("toDate", to.getTime());
+        if (appName != null) {
+            sqlQuery.setString("appName", appName);
+        }
+
+        sqlQuery.addScalar("count", LongType.INSTANCE);
+
+        return (Long) sqlQuery.uniqueResult();
     }
 }

@@ -6,6 +6,8 @@ import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.RequestDetails;
 import com.ghx.hackaton.analytics.model.dto.RequestDuration;
 import com.ghx.hackaton.analytics.service.RequestService;
+import com.ghx.hackaton.analytics.service.order.Order;
+import com.ghx.hackaton.analytics.service.pagination.Pagination;
 import com.ghx.hackaton.analytics.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,8 +63,13 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> find(Date from, Date to, String appName) {
-        return requestDAO.find(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to), appName);
+    public List<Request> findAll(Date from, Date to, String appName) {
+        return requestDAO.findAll(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to), appName);
+    }
+
+    @Override
+    public List<Request> findAggregatedByUrl(Date from, Date to, String appName, Order order, Pagination pagination) {
+        return requestDAO.getAggregatedByUrlSorted(DateUtil.truncateToHour(from), DateUtil.truncateToHour(to), appName, order, pagination);
     }
 
     @Override
@@ -83,12 +90,12 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<Request> getMostFrequent(Date from, Date to, String appName, int howMany) {
-        return requestDAO.getTopAggregatedByUrlSorted(from, to, appName, "count", false, howMany);
+        return requestDAO.getAggregatedByUrlSorted(from, to, appName, new Order("count", false), new Pagination(1, howMany));
     }
 
     @Override
     public List<Request> getSlowest(Date from, Date to, String appName, int howMany) {
-        return requestDAO.getTopAggregatedByUrlSorted(from, to, appName, "avgDuration", false, howMany);
+        return requestDAO.getAggregatedByUrlSorted(from, to, appName, new Order("avgDuration", false), new Pagination(1, howMany));
     }
 
     @Override
@@ -105,4 +112,10 @@ public class RequestServiceImpl implements RequestService {
         return requestDAO.getAppURLs(appName);
     }
 
+    @Override
+    public long pagesCount(Date from, Date to, String appName, Pagination pagination) {
+        long total = requestDAO.aggregatedByUrlCount(from, to, appName);
+        int itemsPerPage = pagination.getItemsPerPage();
+        return total / itemsPerPage + (total % itemsPerPage != 0 ? 1 : 0);
+    }
 }

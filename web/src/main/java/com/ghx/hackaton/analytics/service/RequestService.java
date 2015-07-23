@@ -2,6 +2,8 @@ package com.ghx.hackaton.analytics.service;
 
 import com.ghx.hackaton.analytics.model.Request;
 import com.ghx.hackaton.analytics.model.dto.RequestDuration;
+import com.ghx.hackaton.analytics.service.order.Order;
+import com.ghx.hackaton.analytics.service.pagination.Pagination;
 
 import java.util.Date;
 import java.util.List;
@@ -10,7 +12,9 @@ public interface RequestService {
 
     void saveOrUpdate(List<Request> requests);
 
-    List<Request> find(Date from, Date to, String appName);
+    List<Request> findAll(Date from, Date to, String appName);
+
+    List<Request> findAggregatedByUrl(Date from, Date to, String appName, Order order, Pagination pagination);
 
     void delete(Date from, Date to);
 
@@ -27,5 +31,7 @@ public interface RequestService {
     List<String> getAppNames();
 
     List<String> getAppURLs(String appName);
+
+    long pagesCount(Date from, Date to, String appName, Pagination pagination);
 
 }

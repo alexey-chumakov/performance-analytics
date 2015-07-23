@@ -64,7 +64,7 @@ public class RequestServiceTest  {
 
         requestService.saveOrUpdate(testRequests2);
 
-        List<Request> requests2 = requestService.find(TEST_DATE, TEST_DATE, null);
+        List<Request> requests2 = requestService.findAll(TEST_DATE, TEST_DATE, null);
         Assert.assertTrue("Request should have been saved and then updated", requests2.size() == 1);
 
         Request tested = requests2.get(0);
