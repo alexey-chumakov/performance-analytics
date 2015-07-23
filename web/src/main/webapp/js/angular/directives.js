@@ -182,8 +182,7 @@ angular
             scope: {
                 sort: '=',
                 field: '@',
-                title: '@',
-                onChange: '&'
+                title: '@'
             },
             link: function (scope, element, attr) {
                 scope.setOrder = function(field){
@@ -202,12 +201,6 @@ angular
                 scope.isDescending = function(field){
                     return scope.sort.field == field && !scope.sort.asc;
                 };
-
-                scope.$watch('sort', function() {
-                    if (typeof scope.onChange === 'function') {
-                        scope.onChange();
-                    }
-                }, true);
             }
         }
     })
@@ -224,8 +217,7 @@ angular
             '</ul>',
             scope: {
                 pagination: '=',
-                hasMore: '&',
-                onChange: "&"
+                hasMore: '&'
             },
             link: function (scope, element, attr) {
                 var pagesArray = function() {
@@ -280,9 +272,6 @@ angular
                 };
 
                 scope.$watch('pagination', function() {
-                    if (typeof scope.onChange === 'function') {
-                        scope.onChange();
-                    }
                     scope.pagesArr = pagesArray();
                 }, true);
             }

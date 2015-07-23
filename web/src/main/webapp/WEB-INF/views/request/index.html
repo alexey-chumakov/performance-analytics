@@ -15,18 +15,18 @@
                 <thead>
                 <tr>
 
-                    <th><span sort-field sort="sort" field = "appName" title="App name" on-change="sortingChanged()"></span></th>
-                    <th><span sort-field sort="sort" field = "serverId" title="Server" on-change="sortingChanged()"></span></th>
-                    <th><span sort-field sort="sort" field = "url" title="Url" on-change="sortingChanged()"></span></th>
-                    <th><span sort-field sort="sort" field = "count" title="Count" on-change="sortingChanged()"></span></th>
-                    <th><span sort-field sort="sort" field = "avgDuration" title="Avg duration" on-change="sortingChanged()"></span></th>
+                    <th><span sort-field sort="options.sort" field = "appName" title="App name" ></span></th>
+                    <th><span sort-field sort="options.sort" field = "serverId" title="Server" ></span></th>
+                    <th><span sort-field sort="options.sort" field = "url" title="Url" ></span></th>
+                    <th><span sort-field sort="options.sort" field = "count" title="Count" ></span></th>
+                    <th><span sort-field sort="options.sort" field = "avgDuration" title="Avg duration" ></span></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="request in requests">
                     <td>{{request.appName}}</td>
                     <td>{{request.serverId}}</td>
-                    <td><span url-statistics start-date="filter.dateRange.startDate" end-date="filter.dateRange.endDate" app-name="filter.appName" url="request.url"></span></td>
+                    <td><span url-statistics start-date="options.filter.dateRange.startDate" end-date="options.filter.dateRange.endDate" app-name="options.filter.appName" url="request.url"></span></td>
                     <td>{{request.count}}</td>
                     <td>{{request.avgDuration | number : 2}} ms</td>
                 </tr>
@@ -37,5 +37,5 @@
 </div>
 
 <div class="row">
-    <div pagination="pagination" has-more="hasMore()" on-change="paginationChanged()" ></div>
+    <div pagination="options.pagination" has-more="hasMore()" ></div>
 </div>
